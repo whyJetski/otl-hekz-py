@@ -30,6 +30,7 @@ uintptr_t milliseconds_now() {
     }
 }
 
+// xd
 float CachedFramerates[1000];
 
 float MaxArr(float arr[], int n)
