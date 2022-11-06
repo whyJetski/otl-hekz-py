@@ -2820,7 +2820,7 @@ inline bool Cheat::Tools::CompareByteArray(BYTE* data, BYTE* sig, SIZE_T size)
     }
     return true;
 }
-//a
+//aa
 inline BYTE* Cheat::Tools::FindSignature(BYTE* start, BYTE* end, BYTE* sig, SIZE_T size)
 {
     for (BYTE* it = start; it < end - size; it++) {
