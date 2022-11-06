@@ -35,7 +35,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\Bigga\Desktop\sot\My Destiny\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)include;($(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
@@ -57,7 +57,7 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <DebugInformationFormat>None</DebugInformationFormat>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>D:\1Sea-of-Cheaters-main\include\imgui\imgui.h;D:\1Sea-of-Cheaters-main\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\1Sea-of-Cheaters-main\include\imgui\imgui.h;$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
