@@ -223,7 +223,7 @@ public:
 	void* Func; //0x00B0
 };
 
-// even talan? 55 new, 59 old
+// even talan? 55 new, 59 olddddddddddd
 inline void ProcessEvent(void* obj, UFunction* function, void* parms)
 {
 	auto vtable = *reinterpret_cast<void***>(obj);
