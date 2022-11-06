@@ -350,8 +350,8 @@ struct APlayerState // 11.06
 struct FMinimalViewInfo {
 	FVector Location;
 	FRotator Rotation;
-	char UnknownData_18[0x28]; // 0x10 old
-	//float FOV;// 0x28(0x4)
+	char UnknownData_18[0x10];
+	float FOV;  // 0x28(0x4)
 };
 
 struct UFOVHandlerFunctions_GetTargetFOV_Params
@@ -562,7 +562,7 @@ struct UHealthComponent {
 };
 
 
-// 0x7AB old   0x7B3 0x7AD 758? 5D8?  
+// 0x7AB old   0x7B3 0x7AD 758? 5D8?   class Engine.Character
 // 11.06 0x440(0x8)??? 0x5D0 volt
 struct USkeletalMeshComponent {
 	char pad[0x440];
@@ -778,11 +778,11 @@ struct ABucket {
 	unsigned char                                      UnknownData_7SEW[0x1];                                     // 0x0870(0x0001) MISSED OFFSET (FIX SPACE BETWEEN PREVIOUS PROPERTY)
 	unsigned char                                      UnknownData_NP3V[0x76];                                    // 0x0872(0x0076) MISSED OFFSET (FIX SPACE BETWEEN PREVIOUS PROPERTY)
 	class UParticleSystemComponent* BucketContentsEffect;                                      // 0x08D0(0x0008) (ExportObject, ZeroConstructor, InstancedReference, IsPlainOldData, NoDestructor, HasGetValueTypeHash)
-	unsigned char                                      UnknownData_ZK3R[0x10];                                    // 0x08F0(0x0010) MISSED OFFSET (PADDING)
+	unsigned char                                      UnknownData_ZK3R[0x8];                                    // 0x08F0(0x0010) MISSED OFFSET (PADDING)
 };
 //11.06
 struct AProjectileWeapon {
-	char pad[0x7C0];
+	char pad[0x7D0];
 	FProjectileWeaponParameters WeaponParameters; //0x7c8(0x1e8)
 
 	bool CanFire()
@@ -819,10 +819,10 @@ struct UWorldMapIslandDataAsset {
 };
 //11.06
 struct UIslandDataAssetEntry {
-	char pad[0x0040];
+	char pad[0x40];
 	UWorldMapIslandDataAsset* WorldMapData; //  0x40(0x8)
-	char pad2[0x0068];
-	FString* LocalisedName; // 0x00B0
+	char pad2[0x68];
+	FString* LocalisedName; // 0x00B0(0x38)
 };
 //11.06
 struct UIslandDataAsset {
@@ -934,7 +934,7 @@ struct FCrewSessionTemplate : public FSessionTemplate
 	unsigned char                                      UnknownData_JPXK[0x4];                                     // 0x0034(0x0004) MISSED OFFSET (PADDING)
 
 };
-//11.06 ?
+//11.06 
 struct FCrew
 {
 	struct FGuid                                       CrewId;                                                   // 0x0000(0x0010) (ZeroConstructor, IsPlainOldData)
@@ -974,7 +974,7 @@ struct AShipService
 		return num;
 	}
 };
-//11.06
+//11.06 IDE VISSZA
 struct AAthenaGameState {
 	char pad[0x5b0];
 	struct AWindService* WindService; // 0x5b0(0x8)
@@ -988,9 +988,10 @@ struct AAthenaGameState {
 	struct AFFTWaterService* WaterService; // 0x5f0(0x8)
 	struct AStormService* StormService; // 0x5f8(0x8)
 	struct ACrewService* CrewService; // 0x600(0x8)
+	struct ACaptainedSessionService* CaptainedSessionService; // 0x608(0x08)
 	struct AContestZoneService* ContestZoneService; // 0x608(0x8)
 	struct AContestRowboatsService* ContestRowboatsService; // 0x610(0x08)
-	struct AIslandService* IslandService; // 0x618(0x08)
+	struct AIslandService* IslandService; // 0x620(0x08)
 	struct ANPCService* NPCService; // 0x620(0x08)
 	struct ASkellyFortService* SkellyFortService; // 0x628(0x08)
 	struct ADeepSeaRegionService* DeepSeaRegionService; // 0x630(0x08)
@@ -1361,7 +1362,7 @@ struct UDrunkennessComponent
 //11.06 ?
 class ACharacter : public UObject {
 public:
-
+	
 	char pad1[0x3C0];	//0x28 from inherit
 	APlayerState* PlayerState;  // 0x03F0									// 0x3e8(0x8) same?
 	char pad2[0x10];
@@ -1378,7 +1379,7 @@ public:
 	char pad6[0x4D8];
 	UDrunkennessComponent* DrunkennessComponent; // 0xd30(0x8) D38
 	char pad7[0x8];
-	UDrowningComponent* DrowningComponent;// 0xd40(0x8)  D48
+	UDrowningComponent* DrowningComponent;// 0xd40(0x8)  D48  
 
 	void ReceiveTick(float DeltaSeconds)
 	{
@@ -1953,12 +1954,12 @@ struct UPlayer {
 	char UnknownData00[0x30];
 	AController* PlayerController;
 };
-//11.06
+//11.06 00_38->28_10
 struct UGameInstance {
 	char UnknownData00[0x38];
 	TArray<UPlayer*> LocalPlayers; // 0x38
 };
-//nem tom  0xc8 talán: ?
+//11.06            Class Engine.Level                       struct ULevel : UObject {
 struct ULevel {
 	char UnknownData00[0xA0];
 	TArray<ACharacter*> AActors;
