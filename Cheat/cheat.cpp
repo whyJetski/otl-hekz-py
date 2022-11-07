@@ -1552,24 +1552,24 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             }
                             */
                             }
+                            /*
+                             if (cfg.visuals.players.bSkeleton)
+                            {
+                                auto const mesh = actor->Mesh;
+                                if (!actor->Mesh) continue;
 
-                            // if (cfg.visuals.players.bSkeleton) todo:fix bones
-                           // {
-                            //    auto const mesh = actor->Mesh;
-                             //   if (!actor->Mesh) continue;
+                                const BYTE bodyHead[] = { 4, 5, 6, 51, 7, 6, 80, 7, 8, 9 };
+                                const BYTE neckHandR[] = { 80, 81, 82, 83, 84 };
+                                const BYTE neckHandL[] = { 51, 52, 53, 54, 55 };
+                                const BYTE bodyFootR[] = { 4, 111, 112, 113, 114 };
+                                const BYTE bodyFootL[] = { 4, 106, 107, 108, 109 };
 
-                            //    const BYTE bodyHead[] = { 4, 5, 6, 51, 7, 6, 80, 7, 8, 9 };
-                            //    const BYTE neckHandR[] = { 80, 81, 82, 83, 84 };
-                            //    const BYTE neckHandL[] = { 51, 52, 53, 54, 55 };
-                            //    const BYTE bodyFootR[] = { 4, 111, 112, 113, 114 };
-                            //    const BYTE bodyFootL[] = { 4, 106, 107, 108, 109 };
+                                const std::pair<const BYTE*, const BYTE> skeleton[] = { {bodyHead, 10}, {neckHandR, 5}, {neckHandL, 5}, {bodyFootR, 5}, {bodyFootL, 5} };
 
-                             //   const std::pair<const BYTE*, const BYTE> skeleton[] = { {bodyHead, 10}, {neckHandR, 5}, {neckHandL, 5}, {bodyFootR, 5}, {bodyFootL, 5} };
-
-                             //   const FMatrix comp2world = mesh->K2_GetComponentToWorld().ToMatrixWithScale();
-                             //   if (!Drawing::RenderSkeleton(localController, mesh, comp2world, skeleton, 5, col)) continue;
-                           // }
-
+                                const FMatrix comp2world = mesh->K2_GetComponentToWorld().ToMatrixWithScale();
+                               if (!Drawing::RenderSkeleton(localController, mesh, comp2world, skeleton, 5, col)) continue;
+                           }
+                           */
                             if (cfg.visuals.players.bName)
                             {
                                 auto const playerState = actor->PlayerState;
@@ -2314,8 +2314,8 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     ImGui::Checkbox("Enable", &cfg.visuals.players.bEnable);
                     ImGui::Checkbox("Draw Teammates", &cfg.visuals.players.bDrawTeam);
                     ImGui::Checkbox("Draw Name", &cfg.visuals.players.bName);
-                   // ImGui::Checkbox("Draw Weapon Name WIP ", &cfg.visuals.players.bWeaponanmes); todo: re enable once working
-                   // ImGui::Checkbox("Draw Skeleton WIP ", &cfg.visuals.players.bSkeleton);
+                    //ImGui::Checkbox("Draw Weapon Name WIP ", &cfg.visuals.players.bWeaponanmes);
+                    //ImGui::Checkbox("Draw Skeleton WIP ", &cfg.visuals.players.bSkeleton);
                     ImGui::Combo("Box Type", reinterpret_cast<int*>(&cfg.visuals.players.boxType), boxes, IM_ARRAYSIZE(boxes));
                     ImGui::Combo("Health Bar Type", reinterpret_cast<int*>(&cfg.visuals.players.barType), bars, IM_ARRAYSIZE(bars));
                     ImGui::ColorEdit4("Visible Enemy Color", &cfg.visuals.players.enemyColorVis.x, 0);
