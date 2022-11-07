@@ -673,13 +673,14 @@ struct FWeaponProjectileParams
 	float                                              Velocity;                                                 // 0x0010(0x0004) (Edit, BlueprintVisible, ZeroConstructor, IsPlainOldData)
 	char pad_78[0x94];
 };
-//11.06
+//11.07
 struct FProjectileShotParams
 {
 	int                                                Seed;                                                     // 0x0000(0x0004) (Edit, BlueprintVisible, ZeroConstructor, IsPlainOldData)
 	float                                              ProjectileDistributionMaxAngle;                           // 0x0004(0x0004) (Edit, BlueprintVisible, ZeroConstructor, IsPlainOldData)
 	int                                                NumberOfProjectiles;                                      // 0x0008(0x0004) (Edit, BlueprintVisible, ZeroConstructor, IsPlainOldData)
 	float                                              ProjectileMaximumRange;                                   // 0x000C(0x0004) (Edit, BlueprintVisible, ZeroConstructor, IsPlainOldData)
+	float											   ProjectileHitScanMaximumRange; // 0x10(0x04)
 	float                                              ProjectileDamage;                                         // 0x0014(0x0004) (Edit, BlueprintVisible, ZeroConstructor, IsPlainOldData)
 	float                                              ProjectileDamageMultiplierAtMaximumRange;                 // 0x0018(0x0004) (Edit, BlueprintVisible, ZeroConstructor, IsPlainOldData)
 };
@@ -697,8 +698,10 @@ struct FProjectileWeaponParameters {
 	float ProjectileDistributionMaxAngle; // 0x54(0x04)
 	int NumberOfProjectiles; // 0x58(0x04)
 	float ProjectileMaximumRange; // 0x5c(0x04)
+	float ProjectileHitScanMaximumRange; // 0x60(0x04)
 	float ProjectileDamage; // 0x64(0x04)
 	float ProjectileDamageMultiplierAtMaximumRange; // 0x68(0x04)
+	char UnknownData_6C[0x4]; // 0x6c(0x04)
 	struct UClass* DamagerType; // 0x70(0x08)
 	struct UClass* ProjectileId; // 0x78(0x08)
 	struct FWeaponProjectileParams AmmoParams; // 0x80(0xa8)
@@ -782,8 +785,8 @@ struct ABucket {
 };
 //11.06
 struct AProjectileWeapon {
-	char pad[0x7D0];
-	FProjectileWeaponParameters WeaponParameters; //0x7c8(0x1e8)
+	char pad[0x7C8];
+	FProjectileWeaponParameters WeaponParameters; //0x7c8(0x1e8) 7d0xD
 
 	bool CanFire()
 	{
