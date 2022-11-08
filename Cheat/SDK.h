@@ -318,6 +318,7 @@ struct FPirateDescription
 };
 
 struct AAthenaPlayerCharacter {
+
 };
 
 struct APlayerState // 11.06
@@ -947,11 +948,16 @@ struct FCrew
 	struct FGuid                                       LiveryID;                                                 // 0x0068(0x0010) (ZeroConstructor, IsPlainOldData)
 	unsigned char                                      UnknownData00[0x8];                                       // 0x0078(0x0008) MISSED OFFSET
 	TArray<class AActor*>                              AssociatedActors;                                         // 0x0080(0x0010) (ZeroConstructor)
+	bool HasEverSetSail; // 0x90(0x01)
+	char UnknownData_91[0x3]; // 0x91(0x03)
+	int32_t ScrambleNameIndex; // 0x94(0x04)
+
 };
 //11.06
 struct ACrewService {
-	char pad[0x04A0]; 
+	char pad[0x4A0]; 
 	TArray<FCrew> Crews; // 0x04A0
+	
 };
 //11.06
 struct AShip
@@ -1384,7 +1390,7 @@ class ACharacter : public UObject {
 public:
 	
 	char pad1[0x3C0];	//0x28 from inherit
-	APlayerState* PlayerState;  // 0x03F0									// 0x3e8(0x8) same?
+	APlayerState* PlayerState;  // 0x3e8(0x8) same?
 	char pad2[0x10];
 	AController* Controller;// 0x400(0x8)            same????
 	char pad3[0x38];
@@ -1978,6 +1984,10 @@ struct UPlayer {
 struct UGameInstance {
 	char UnknownData00[0x38];
 	TArray<UPlayer*> LocalPlayers; // 0x38
+
+	struct UOnlineSession* OnlineSession; // 0x50(0x08)  idk hogy kell e ez id
+	
+
 };
 //11.06            Class Engine.Level                       struct ULevel : UObject {
 struct ULevel {
