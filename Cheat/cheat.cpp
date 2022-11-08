@@ -1370,6 +1370,65 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             }
                         }
 
+                        if (cfg.visuals.flag.bEnable)
+                        {
+                            if (cfg.visuals.flag.bName)
+                            {
+                                const FVector location = actor->K2_GetActorLocation();
+                                FVector2D screen;
+                                if (actor->isEmissaryFlag())
+                                {
+                                    const int dist = localLoc.DistTo(location) * 0.01f;
+                                    if (dist > cfg.visuals.flag.drawdistance) continue;
+                                    if (localController->ProjectWorldLocationToScreen(location, screen))
+                                    {
+                                        char buf[0x64];
+                                        sprintf(buf, "Emissary Flag [%dm]", dist);
+                                        Drawing::RenderText(buf, screen, cfg.visuals.flag.textCol);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (cfg.visuals.seagulls.bEnable)
+                        {
+                            if (cfg.visuals.seagulls.bName) 
+                            {
+                                const FVector location = actor->K2_GetActorLocation();
+                                FVector2D screen;
+                                auto type = actor->GetName();
+                                if (type.find("Seagull") != std::string::npos)
+                                {
+                                    const int dist = localLoc.DistTo(location) * 0.01f;
+                                    if (dist > cfg.visuals.seagulls.drawdistance) continue;
+                                    if (localController->ProjectWorldLocationToScreen(location, screen))
+                                    {
+                                        char buf[0x64];
+                                        sprintf(buf, "Seagulls [%dm]", dist);
+                                        Drawing::RenderText(buf, screen, cfg.visuals.seagulls.textCol);
+                                    }
+                                }
+                                // EMISSARY FLAG TEST :D
+                               /* if (type.find("EmissaryFlotsam") != std::string::npos)
+                                {
+                                    if (actor->isItem())
+                                    {
+                                        const int dist = localLoc.DistTo(location) * 0.01f;
+                                        if (dist > cfg.visuals.seagulls.drawdistance) continue;
+                                        if (localController->ProjectWorldLocationToScreen(location, screen))
+                                        {
+                                            auto const desc = actor->GetItemInfo()->Desc;
+                                            if (!desc) continue;
+                                            char buf[0x64];
+                                            const int len = desc->Title->multi(buf, 0x50);
+                                            snprintf(buf + len, sizeof(buf) - len, " [%dm]", dist);
+                                            Drawing::RenderText(buf, screen, cfg.visuals.seagulls.textCol);
+                                        }
+                                    }
+                                }*/
+                            }
+
+                        }
                         if (cfg.visuals.client.bDebug)
                         {
                             const FVector location = actor->K2_GetActorLocation();
@@ -1386,7 +1445,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                     auto type = actor->GetName();
                                     auto superName = super->GetNameFast();
                                     auto className = actorClass->GetNameFast();
-                                    if (superName && className)
+                                    if (superName && className  /*&&!(type.find("EmissaryFlotsam_Reapers") != std::string::npos)*/)
                                     {
                                         char buf[0x128];
                                         sprintf(buf, " %s %s [%dm] (%p)", className, superName, (int)dist, actor);
@@ -2525,9 +2584,29 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 }
                 ImGui::EndChild();
 
+                ImGui::NextColumn();
+                ImGui::Text("Seagulls");
+                if (ImGui::BeginChild("SeagullsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                {
+                    ImGui::Checkbox("Enable", &cfg.visuals.seagulls.bEnable);
+                    ImGui::Checkbox("Draw Name", &cfg.visuals.seagulls.bName);
+                    ImGui::ColorEdit4("Text Color", &cfg.visuals.seagulls.textCol.x, 0);
+                    ImGui::SliderFloat("Draw Distance", &cfg.visuals.seagulls.drawdistance, 0.f, 20000.f, "%.0f");
+                }
+                ImGui::EndChild();
+
+                ImGui::NextColumn();
+                ImGui::Text("Flag");
+                if (ImGui::BeginChild("FlagSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                {
+                    ImGui::Checkbox("Enable", &cfg.visuals.flag.bEnable);
+                    ImGui::Checkbox("Draw Name", &cfg.visuals.flag.bName);
+                    ImGui::ColorEdit4("Text Color", &cfg.visuals.flag.textCol.x, 0);
+                    ImGui::SliderFloat("Draw Distance", &cfg.visuals.flag.drawdistance, 0.f, 1725.f, "%.0f");
+                }
+                ImGui::EndChild();
+
                 ImGui::Columns();
-
-
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem(ICON_FA_CROSSHAIRS " Aim")) {
