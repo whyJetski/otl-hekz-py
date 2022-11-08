@@ -1738,6 +1738,16 @@ public:
 		return IsA(obj);
 	}
 
+	inline bool isSeagulls() {
+		static auto obj = UObject::FindClass("Class Athena.Seagulls");
+		return IsA(obj);
+	}
+
+	inline bool isEmissaryFlag() {
+		static auto obj = UObject::FindClass("Class Athena.EmissaryFlag");
+		return IsA(obj);
+	}
+
 	AHullDamage* GetHullDamage() {
 		static auto fn = UObject::FindObject<UFunction>("Function Athena.Ship.GetHullDamage");
 		AHullDamage* params = nullptr;
