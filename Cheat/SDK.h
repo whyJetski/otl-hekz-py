@@ -566,7 +566,7 @@ struct UHealthComponent {
 // 0x7AB old   0x7B3 0x7AD 758? 5D8?   class Engine.Character
 // 11.06 0x440(0x8)??? 0x5D0 volt
 struct USkeletalMeshComponent {
-	char pad[0x440];
+	char pad[0x5d8];
 	TArray<FTransform> SpaceBasesArray[2];
 	int CurrentEditableSpaceBases;
 	int CurrentReadSpaceBases;
@@ -946,11 +946,12 @@ struct FCrew
 	TArray<class APlayerState*>                        Players;                                                  // 0x0020(0x0010) (ZeroConstructor)
 	struct FCrewSessionTemplate                        CrewSessionTemplate;                                      // 0x0030(0x0038)
 	struct FGuid                                       LiveryID;                                                 // 0x0068(0x0010) (ZeroConstructor, IsPlainOldData)
-	unsigned char                                      UnknownData00[0x8];                                       // 0x0078(0x0008) MISSED OFFSET
-	TArray<class AActor*>                              AssociatedActors;                                         // 0x0080(0x0010) (ZeroConstructor)
+	unsigned char											   UnknownData_78[0x8];                                      // 0x0078(0x0008) MISSED OFFSET
+	struct TArray<struct AActor*>                      AssociatedActors;                                         // 0x0080(0x0010) (ZeroConstructor)
 	bool HasEverSetSail; // 0x90(0x01)
 	char UnknownData_91[0x3]; // 0x91(0x03)
 	int32_t ScrambleNameIndex; // 0x94(0x04)
+	
 
 };
 //11.06
@@ -1139,61 +1140,64 @@ struct ABootyStorageService
 /*char UnknownData_500 ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?
 11.06 */
 struct ACannon {
-	char pad_4324[0x0538];
-	struct USkeletalMeshComponent* BaseMeshComponent; // 0x538(0x8)
-	struct UStaticMeshComponent* BarrelMeshComponent; // 0x540(0x8)
-	struct UStaticMeshComponent* FuseMeshComponent; // 0x548(0x8)
-	struct UReplicatedShipPartCustomizationComponent* CustomizationComponent; // 0x550(0x8)
-	struct ULoadableComponent* LoadableComponent; // 0x558(0x8)
-	struct ULoadingPointComponent* LoadingPointComponent; // 0x560(0x8)
-	struct UChildActorComponent* CannonBarrelInteractionComponent; // 0x568(0x8)
-	struct UFuseComponent* FuseComponent; // 0x570(0x8)
-	struct FName CameraSocket; // 0x578(0x8)
-	struct FName CameraInsideCannonSocket; // 0x580(0x8)
-	struct FName LaunchSocket; // 0x588(0x8)
-	struct FName TooltipSocket; // 0x590(0x8)
-	struct FName AudioAimRTPCName; // 0x598(0x8)
-	struct FName InsideCannonRTPCName; // 0x5a0(0x8)
-	struct UClass* ProjectileClass; // 0x5a8(0x8)
-	float TimePerFire; // 0x5b0(0x4)
-	float ProjectileSpeed; // 0x5b4(0x4)
-	float ProjectileGravityScale; // 0x5b8(0x4)
+	char UnknownData_510[0x538]; // 0x510(0x28)
+	struct USkeletalMeshMemoryConstraintComponent* BaseMeshComponent; // 0x538(0x08)
+	struct UStaticMeshMemoryConstraintComponent* BarrelMeshComponent; // 0x540(0x08)
+	struct UStaticMeshComponent* FuseMeshComponent; // 0x548(0x08)
+	struct UReplicatedShipPartCustomizationComponent* CustomizationComponent; // 0x550(0x08)
+	struct ULoadableComponent* LoadableComponent; // 0x558(0x08)
+	struct ULoadingPointComponent* LoadingPointComponent; // 0x560(0x08)
+	struct UChildActorComponent* CannonBarrelInteractionComponent; // 0x568(0x08)
+	struct UFuseComponent* FuseComponent; // 0x570(0x08)
+	struct FName CameraSocket; // 0x578(0x08)
+	struct FName CameraInsideCannonSocket; // 0x580(0x08)
+	struct FName LaunchSocket; // 0x588(0x08)
+	struct FName TooltipSocket; // 0x590(0x08)
+	struct FName AudioAimRTPCName; // 0x598(0x08)
+	struct FName InsideCannonRTPCName; // 0x5a0(0x08)
+	struct UClass* ProjectileClass; // 0x5a8(0x08)
+	float TimePerFire; // 0x5b0(0x04)
+	float ProjectileSpeed; // 0x5b4(0x04)
+	float ProjectileGravityScale; // 0x5b8(0x04)
 	struct FFloatRange PitchRange; // 0x5bc(0x10)
 	struct FFloatRange YawRange; // 0x5cc(0x10)
-	float PitchSpeed; // 0x5dc(0x4)
+	float PitchSpeed; // 0x5dc(0x04)
 	float YawSpeed; // 0x5e0(0x04)
-	char UnknownData_5D4[0x4]; // 0x5d4(0x04)
-	struct UClass* CameraShake; // 0x5e8(0x8)
-	float ShakeInnerRadius; // 0x5f0(0x4)
-	float ShakeOuterRadius; // 0x5f4(0x4)
-	float CannonFiredAINoiseRange; // 0x5f4(0x4)
-	struct FName AINoiseTag; // 0x5fc(0x8)
-	unsigned char                                      UnknownData_WIJI[0x4];                                     // 0x05F4(0x0004) MISSED OFFSET (FIX SPACE BETWEEN PREVIOUS PROPERTY)
-	char pad_956335424[0x18];
-	unsigned char                                      UnknownData_YCZ3[0x20];                                    // 0x05F4(0x0020) FIX WRONG TYPE SIZE OF PREVIOUS PROPERTY
-	char pad_9335443224[0x18];
-	unsigned char                                      UnknownData_BEDV[0x20];                                    // 0x0630(0x0020) FIX WRONG TYPE SIZE OF PREVIOUS PROPERTY
-	float DefaultFOV; // 0x690(0x4)
-	float AimFOV; // 0x694(0x4)
-	float IntoAimBlendSpeed; // 0x698(0x4)
-	float OutOfAimBlendSpeed; // 0x69c(0x4)
-	struct UWwiseEvent* FireSfx; // 0x6a0(0x8)
-	struct UWwiseEvent* DryFireSfx; // 0x6a8(0x8)
-	struct UWwiseEvent* LoadingSfx_Play; // 0x6b0(0x8)
-	struct UWwiseEvent* LoadingSfx_Stop; // 0x6b8(0x8)
-	struct UWwiseEvent* UnloadingSfx_Play; // 0x6c0(0x8)
-	struct UWwiseEvent* UnloadingSfx_Stop; // 0x6c8(0x8)
-	struct UWwiseEvent* LoadedPlayerSfx; // 0x6d0(0x8)
-	struct UWwiseEvent* UnloadedPlayerSfx; // 0x6d8(0x8)
-	struct UWwiseEvent* FiredPlayerSfx; // 0x6e0(0x8)
-	struct UWwiseObjectPoolWrapper* SfxPool; // 0x6e8(0x8)
-	struct UWwiseEvent* StartPitchMovement; // 0x6f0(0x8)
-	struct UWwiseEvent* StopPitchMovement; // 0x6f8(0x8)
-	struct UWwiseEvent* StartYawMovement; // 0x700(0x8)
-	struct UWwiseEvent* StopYawMovement; // 0x708(0x8)
+	char UnknownData_5E4[0x4]; // 0x5e4(0x04)
+	struct UClass* CameraShake; // 0x5e8(0x08)
+	float ShakeInnerRadius; // 0x5f0(0x04)
+	float ShakeOuterRadius; // 0x5f4(0x04)
+	float CannonFiredAINoiseRange; // 0x5f8(0x04)
+	struct FName AINoiseTag; // 0x5fc(0x08)
+	char UnknownData_604[0x4]; // 0x604(0x04)
+	//struct FText CannonDisabledToolTipText; 
+	char pad[0x38];// 0x608(0x38)
+	//struct FText LoadingDisabledToolTipText; 
+	char pad2[0x38];// 0x640(0x38)
+	struct UClass* UseCannonInputId; // 0x678(0x08)
+	struct UClass* StartLoadingCannonInputId; // 0x680(0x08)
+	struct UClass* StopLoadingCannonInputId; // 0x688(0x08)
+	float DefaultFOV; // 0x690(0x04)
+	float AimFOV; // 0x694(0x04)
+	float IntoAimBlendSpeed; // 0x698(0x04)
+	float OutOfAimBlendSpeed; // 0x69c(0x04)
+	struct UWwiseEvent* FireSfx; // 0x6a0(0x08)
+	struct UWwiseEvent* DryFireSfx; // 0x6a8(0x08)
+	struct UWwiseEvent* LoadingSfx_Play; // 0x6b0(0x08)
+	struct UWwiseEvent* LoadingSfx_Stop; // 0x6b8(0x08)
+	struct UWwiseEvent* UnloadingSfx_Play; // 0x6c0(0x08)
+	struct UWwiseEvent* UnloadingSfx_Stop; // 0x6c8(0x08)
+	struct UWwiseEvent* LoadedPlayerSfx; // 0x6d0(0x08)
+	struct UWwiseEvent* UnloadedPlayerSfx; // 0x6d8(0x08)
+	struct UWwiseEvent* FiredPlayerSfx; // 0x6e0(0x08)
+	struct UWwiseObjectPoolWrapper* SfxPool; // 0x6e8(0x08)
+	struct UWwiseEvent* StartPitchMovement; // 0x6f0(0x08)
+	struct UWwiseEvent* StopPitchMovement; // 0x6f8(0x08)
+	struct UWwiseEvent* StartYawMovement; // 0x700(0x08)
+	struct UWwiseEvent* StopYawMovement; // 0x708(0x08)
 	struct UWwiseEvent* StopMovementAtEnd; // 0x710(0x08)
-	struct UWwiseObjectPoolWrapper* SfxMovementPool; // 0x718(0x8)
-	struct UObject* FuseVfxFirstPerson; // 0x720(0x8)
+	struct UWwiseObjectPoolWrapper* SfxMovementPool; // 0x718(0x08)
+	struct UObject* FuseVfxFirstPerson; // 0x720(0x08)
 	struct UObject* FuseVfxThirdPerson; // 0x728(0x08)
 	struct UObject* MuzzleFlashVfxFirstPerson; // 0x730(0x08)
 	struct UObject* MuzzleFlashVfxThirdPerson; // 0x738(0x08)
@@ -1201,12 +1205,21 @@ struct ACannon {
 	struct FName BarrelSocketName; // 0x748(0x08)
 	struct UClass* RadialCategoryFilter; // 0x750(0x08)
 	struct UClass* DefaultLoadedItemDesc; // 0x758(0x08)
-	float ClientRotationBlendTime; // 0x760(0x4)
-	char UnknownData_73C[0x4]; // 0x754(0x04)
-	struct AItemInfo* LoadedItemInfo; // 0x768(0x8)
-	unsigned char UnknownData_LECI[0xc]; // 0x760(0x0c)
+	float ClientRotationBlendTime; // 0x760(0x04)
+	char UnknownData_764[0x4]; // 0x764(0x04)
+	struct AItemInfo* LoadedItemInfo; // 0x768(0x08)
+	char UnknownData_770[0x20]; // 0x770(0x20)
+	struct UMemoryConstrainedMeshInitializer* BaseMMCMeshInitializer; // 0x790(0x08)
+	struct UMemoryConstrainedMeshInitializer* BarrelMMCMeshInitializer; // 0x798(0x08)
+	struct UCannonDescAsset* DescToSetWhenSafe; // 0x7a0(0x08)
+	struct UCannonDescAsset* CurrentCannonDesc; // 0x7a8(0x08)
 	float ServerPitch; // 0x7b0(0x04)
 	float ServerYaw; // 0x7b4(0x04)
+	struct UParticleSystemComponent* LoadedItemVFXComp; // 0x7b8(0x08)
+	struct UStaticMesh* DefaultFuseMesh; // 0x7c0(0x08)
+	char UnknownData_7C8[0x4f0]; // 0x7c8(0x4f0)
+	char InteractionState; // 0xcb8(0x01)
+	char UnknownData_CB9[0x7]; // 0xcb9(0x07)
 
 
 	bool IsReadyToFire() {
@@ -1258,6 +1271,56 @@ struct ACannon {
 	}
 
 };
+
+struct UStaticMeshMemoryConstraintComponent
+{
+	char UnknownData_620[0x640]; // 0x620(0x20)
+	struct UMeshMemoryConstraintHandler* Handler; // 0x640(0x08)
+	struct TArray<struct FStringAssetReference> FallbackOverrideMaterials; // 0x648(0x10)
+	struct UClass* MeshFallbackCategory; // 0x658(0x08)
+	//struct FStringAssetReference MeshReference; 
+	char pad[0x10];// 0x660(0x10)
+	int64_t CachedMeshResourceSize; // 0x670(0x08)
+	bool MemoryAccountedFor; // 0x678(0x01)
+	bool NeedMeshLoadOnServer; // 0x679(0x01)
+	char UnknownData_67A[0x6]; // 0x67a(0x06)
+	struct UClass* BudgetToCountMemoryAgainstIfNoFallback; // 0x680(0x08)
+	//struct FFeatureFlag OptionalFeatureToggleForMMC; 
+	char pad2[0x0c];// 0x688(0x0c)
+	char UnknownData_694[0xc]; // 0x694(0x0c)
+
+	bool GetIsMeshFinishedChange()
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Athena.StaticMeshMemoryConstraintComponent.GetIsMeshFinishedChange");
+		bool is_finished = true;
+		ProcessEvent(this, fn, &is_finished);
+		return is_finished;
+	}// Function Athena.StaticMeshMemoryConstraintComponent.GetIsMeshFinishedChange // Final|Native|Public|BlueprintCallable|BlueprintPure|Const // @ game+0x3321080
+};
+
+struct USkeletalMeshSocket {
+	char pad[0x28];
+	struct FName SocketName; // 0x28(0x08)
+	struct FName BoneName; // 0x30(0x08)
+	struct FVector RelativeLocation; // 0x38(0x0c)
+	struct FRotator RelativeRotation; // 0x44(0x0c)
+	struct FVector RelativeScale; // 0x50(0x0c)
+	bool bForceAlwaysAnimated; // 0x5c(0x01)
+	char UnknownData_5D[0x3]; // 0x5d(0x03)
+
+	void InitializeSocketFromLocation(struct USkeletalMeshComponent* SkelComp, struct FVector WorldLocation, struct FVector WorldNormal)
+	{
+
+	}// Function Engine.SkeletalMeshSocket.InitializeSocketFromLocation // Final|RequiredAPI|Native|Public|HasDefaults|BlueprintCallable // @ game+0x30a9f20
+	struct FVector GetSocketLocation(struct USkeletalMeshComponent* SkelComp)
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.SkeletalMeshSocket.GetSocketLocation");
+		FVector socket_location;
+		ProcessEvent(this, fn, &socket_location);
+		return socket_location;
+	}// Function Engine.SkeletalMeshSocket.GetSocketLocation // Final|RequiredAPI|Native|Public|HasDefaults|BlueprintCallable|BlueprintPure|Const // @ game+0x30a9e30
+};
+
 // nemtom ? 
 struct UItemDesc {
 	char pad[0x0028];
@@ -1276,7 +1339,7 @@ struct UInteractableComponent
 };
 // nem tom m1
 struct AHarpoonLauncher {
-	char pad1[0xB04];
+	char pad1[0xB11];
 	FRotator rotation; // 0xB04
 	// ROTATION OFFSET FOUND USING RECLASS.NET: https://www.unknowncheats.me/forum/sea-of-thieves/470590-reclass-net-plugin.html
 
@@ -2008,7 +2071,7 @@ struct ULevel {
 struct UWorld {
 	static inline UWorld** GWorld = nullptr;
 	char pad1[0x30];
-	ULevel* PersistentLevel; // 0x0030(0x8)
+	/*ULevel* PersistentLevel; // 0x0030(0x8)
 	char pad2[0x20];
 	AAthenaGameState* GameState; //0x0058(0x8)
 	char pad3[0xF0];
@@ -2016,7 +2079,48 @@ struct UWorld {
 	char pad4[0x50];
 	ULevel* CurrentLevel; //0x01B0(0x8)
 	char pad5[0x8];
-	UGameInstance* GameInstance; //0x01C0(0x8)
+	UGameInstance* GameInstance; //0x01C0(0x8)*/
+	ULevel* PersistentLevel; // 0x30(0x08)
+	struct UNetDriver* NetDriver; // 0x38(0x08)
+	struct ULineBatchComponent* LineBatcher; // 0x40(0x08)
+	struct ULineBatchComponent* PersistentLineBatcher; // 0x48(0x08)
+	struct ULineBatchComponent* ForegroundLineBatcher; // 0x50(0x08)
+	AAthenaGameState* GameState; // 0x58(0x08)
+	struct AGameNetworkManager* NetworkManager; // 0x60(0x08)
+	struct UPhysicsCollisionHandler* PhysicsCollisionHandler; // 0x68(0x08)
+	struct TArray<struct UObject*> ExtraReferencedObjects; // 0x70(0x10)
+	struct TArray<struct UObject*> PerModuleDataObjects; // 0x80(0x10)
+	struct TArray<struct ULevelStreaming*> StreamingLevels; // 0x90(0x10)
+	struct FString StreamingLevelsPrefix; // 0xa0(0x10)
+	struct ULevel* CurrentLevelPendingVisibility; // 0xb0(0x08)
+	struct AParticleEventManager* MyParticleEventManager; // 0xb8(0x08)
+	struct APhysicsVolume* DefaultPhysicsVolume; // 0xc0(0x08)
+	struct TArray<struct ULevelStreaming*> DirtyStreamingLevels; // 0xc8(0x10)
+	char UnknownData_D8[0x1c]; // 0xd8(0x1c)
+	struct FName Feature; // 0xf4(0x08)
+	char UnknownData_FC[0x4]; // 0xfc(0x04)
+	struct TArray<struct FName> FeatureReferences; // 0x100(0x10)
+	bool ParticleLOD_bUseGameThread; // 0x110(0x01)
+	bool ParticleLOD_bUseMultipleViewportCase; // 0x111(0x01)
+	char UnknownData_112[0x2]; // 0x112(0x02)
+	struct FVector ParticleLOD_PlayerViewpointLocation; // 0x114(0x0c)
+	struct FString TestMetadata; // 0x120(0x10)
+	struct UNavigationSystem* NavigationSystem; // 0x130(0x08)
+	struct AGameMode* AuthorityGameMode; // 0x138(0x08)
+	struct UAISystemBase* AISystem; // 0x140(0x08)
+	struct UAvoidanceManager* AvoidanceManager; // 0x148(0x08)
+	TArray<struct ULevel*> Levels; // 0x150(0x10)
+	char UnknownData_160[0x50]; // 0x160(0x50)
+	struct ULevel* CurrentLevel; // 0x1b0(0x08)
+	char UnknownData_1B8[0x8]; // 0x1b8(0x08)
+	UGameInstance* OwningGameInstance; // 0x1c0(0x08)
+	struct TArray<struct UMaterialParameterCollectionInstance*> ParameterCollectionInstances; // 0x1c8(0x10)
+	char UnknownData_1D8[0x520]; // 0x1d8(0x520)
+	struct UWorldComposition* WorldComposition; // 0x6f8(0x08)
+	char UnknownData_700[0x3d]; // 0x700(0x3d)
+	char UnknownData_73D_0 : 7; // 0x73d(0x01)
+	char bAreConstraintsDirty : 1; // 0x73d(0x01)
+	char UnknownData_73E[0x8a]; // 0x73e(0x8a)
 };
 
 enum class EMeleeWeaponMovementSpeed : uint8_t

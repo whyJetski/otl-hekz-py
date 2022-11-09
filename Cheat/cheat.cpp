@@ -289,10 +289,10 @@ bool raytrace(UWorld* world, const struct FVector& start, const struct FVector& 
     if (world == nullptr || world->PersistentLevel == nullptr) //some checks
         return false;
 
-    return UKismetMathLibrary::LineTraceSingle_NEW((UObject*)world, start, end, ETraceTypeQuery::TraceTypeQuery4, true, TArray<AActor*>() /*actors to ignore*/, EDrawDebugTrace::EDrawDebugTrace__None, true, hit); //TraceTypeQuery4 equals the visibility channel
+    return UKismetMathLibrary::LineTraceSingle_NEW((UObject*)world, start, end, ETraceTypeQuery::TraceTypeQuery1, true, TArray<AActor*>() /*actors to ignore*/, EDrawDebugTrace::EDrawDebugTrace__None, true, hit); //TraceTypeQuery4 equals the visibility channel
 }
 
-bool GetProjectilePath(std::vector<FVector>& v, FVector& Vel, FVector& Pos, float Gravity, int count, UWorld* world)
+/*bool GetProjectilePath(std::vector<FVector>& v, FVector& Vel, FVector& Pos, float Gravity, int count, UWorld* world)
 {
     float interval = 0.033f;
     for (unsigned int i = 0; i < count; ++i)
@@ -315,6 +315,36 @@ bool GetProjectilePath(std::vector<FVector>& v, FVector& Vel, FVector& Pos, floa
         Pos = nextPos;
         if (!res) return true;
     }
+    return false;
+}*/
+
+bool GetProjectilePath(std::vector<FVector>& v, FVector& Vel, FVector& Pos, float Gravity, int count, UWorld* world)
+{
+    float interval = 0.033f;
+
+    for (unsigned int i = 0; i < 250; ++i)
+    {
+        v.push_back(Pos);
+        FVector move;
+        move.X = (Vel.X) * interval;
+        move.Y = (Vel.Y) * interval;
+        float newZ = Vel.Z - (Gravity * interval);
+        move.Z = ((Vel.Z + newZ) * 0.5f) * interval;
+        Vel.Z = newZ;
+        FVector nextPos = Pos + move;
+
+
+        bool res = true;
+        {
+            FHitResult hit_result;
+            res = !raytrace(world, Pos, nextPos, &hit_result);
+        }
+
+
+        Pos = nextPos;
+        if (!res) return true; // we hit something
+    }
+
     return false;
 }
 
@@ -522,7 +552,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
             auto const world = *UWorld::GWorld;
 
             if (!world) break;
-            auto const game = world->GameInstance;
+            auto const game = world->OwningGameInstance;
             if (!game) break;
             auto const gameState = world->GameState;
             if (!gameState) break;
@@ -635,7 +665,9 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 FRotator angle = { cannon->ServerPitch, cannon->ServerYaw, 0.f };
 
                 FRotator comp_angle = attachObject->K2_GetActorRotation();
-                angle += comp_angle;
+                angle.Pitch += comp_angle.Pitch;
+                angle.Yaw += comp_angle.Yaw;
+                angle.Roll += comp_angle.Roll;
 
                 FVector vForward = UKismetMathLibrary::Conv_RotatorToVector(angle);
                 FVector pos = attachObject->K2_GetActorLocation();
@@ -1611,7 +1643,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             }
                             */
                             }
-                            /*
+                            
                              if (cfg.visuals.players.bSkeleton)
                             {
                                 auto const mesh = actor->Mesh;
@@ -1628,7 +1660,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 const FMatrix comp2world = mesh->K2_GetComponentToWorld().ToMatrixWithScale();
                                if (!Drawing::RenderSkeleton(localController, mesh, comp2world, skeleton, 5, col)) continue;
                            }
-                           */
+                           
                             if (cfg.visuals.players.bName)
                             {
                                 auto const playerState = actor->PlayerState;
@@ -2072,37 +2104,37 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 } while (false);
                             }
                         }
-                        //else if (isHarpoon)    todo:fix FRotator offset
-                        //{
-                         //   if (actor->isItem())
-                          //  {
-                            //    do
-                              //  {
-                                //    FVector location = actor->K2_GetActorLocation();
-                        //
-                          //          float dist = cameraLoc.DistTo(location);
-                            //        if (dist > 7770.f || dist < 260.f) { break; }
-                              //      if (cfg.aim.harpoon.bVisibleOnly) if (!localController->LineOfSightTo(actor, cameraLoc, false)) { break; }
-                                //    auto harpoon = reinterpret_cast<AHarpoonLauncher*>(attachObject);
-                                  //  auto center = UKismetMathLibrary::NormalizedDeltaRotator(cameraRot, harpoon->rotation);
-                                    //FRotator delta = UKismetMathLibrary::NormalizedDeltaRotator(UKismetMathLibrary::FindLookAtRotation(cameraLoc, location), center);
-                                   // if (delta.Pitch < -35.f || delta.Pitch > 67.f || abs(delta.Yaw) > 50.f) { break; }
-                                    //FRotator diff = delta - harpoon->rotation;
-                                    //float absPitch = abs(diff.Pitch);
-                                    //float absYaw = abs(diff.Yaw);
-                                    //if (absPitch > cfg.aim.harpoon.fPitch || absYaw > cfg.aim.harpoon.fYaw) { break; }
-                                    //float sum = absYaw + absPitch;
-                                    //if (sum < aimBest.best)
-                                    //{
-                                     //   aimBest.target = actor;
-                                      //  aimBest.location = location;
-                                      //  aimBest.delta = delta;
-                                       // aimBest.best = sum;
-                                    //}
-                        //
-                           //     } while (false);
-                          //  }
-                       // }
+                        else if (isHarpoon)    //todo:fix FRotator offset
+                        {
+                            if (actor->isItem())
+                            {
+                                do
+                                {
+                                    FVector location = actor->K2_GetActorLocation();
+                        
+                                   float dist = cameraLoc.DistTo(location);
+                                    if (dist > 7770.f || dist < 260.f) { break; }
+                                    if (cfg.aim.harpoon.bVisibleOnly) if (!localController->LineOfSightTo(actor, cameraLoc, false)) { break; }
+                                    auto harpoon = reinterpret_cast<AHarpoonLauncher*>(attachObject);
+                                    auto center = UKismetMathLibrary::NormalizedDeltaRotator(cameraRot, harpoon->rotation);
+                                    FRotator delta = UKismetMathLibrary::NormalizedDeltaRotator(UKismetMathLibrary::FindLookAtRotation(cameraLoc, location), center);
+                                   if (delta.Pitch < -35.f || delta.Pitch > 67.f || abs(delta.Yaw) > 50.f) { break; }
+                                    FRotator diff = delta - harpoon->rotation;
+                                    float absPitch = abs(diff.Pitch);
+                                    float absYaw = abs(diff.Yaw);
+                                    if (absPitch > cfg.aim.harpoon.fPitch || absYaw > cfg.aim.harpoon.fYaw) { break; }
+                                    float sum = absYaw + absPitch;
+                                    if (sum < aimBest.best)
+                                    {
+                                        aimBest.target = actor;
+                                        aimBest.location = location;
+                                        aimBest.delta = delta;
+                                        aimBest.best = sum;
+                                    }
+                        
+                                } while (false);
+                            }
+                        }
 
                         else if (!attachObject && isWieldedWeapon)
                         {
@@ -2374,7 +2406,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     ImGui::Checkbox("Draw Teammates", &cfg.visuals.players.bDrawTeam);
                     ImGui::Checkbox("Draw Name", &cfg.visuals.players.bName);
                     //ImGui::Checkbox("Draw Weapon Name WIP ", &cfg.visuals.players.bWeaponanmes);
-                    //ImGui::Checkbox("Draw Skeleton WIP ", &cfg.visuals.players.bSkeleton);
+                    ImGui::Checkbox("Draw Skeleton WIP ", &cfg.visuals.players.bSkeleton);
                     ImGui::Combo("Box Type", reinterpret_cast<int*>(&cfg.visuals.players.boxType), boxes, IM_ARRAYSIZE(boxes));
                     ImGui::Combo("Health Bar Type", reinterpret_cast<int*>(&cfg.visuals.players.barType), bars, IM_ARRAYSIZE(bars));
                     ImGui::ColorEdit4("Visible Enemy Color", &cfg.visuals.players.enemyColorVis.x, 0);
@@ -2654,7 +2686,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 ImGui::Text("Harpoon (WIP) ");
                 if (ImGui::BeginChild("HarpoonSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
                 {
-                    // ImGui::Checkbox("Enable", &cfg.aim.harpoon.bEnable);
+                    ImGui::Checkbox("Enable", &cfg.aim.harpoon.bEnable);
                     ImGui::Checkbox("Visible Only", &cfg.aim.harpoon.bVisibleOnly);
                     ImGui::SliderFloat("Yaw", &cfg.aim.harpoon.fYaw, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
                     ImGui::SliderFloat("Pitch", &cfg.aim.harpoon.fPitch, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
@@ -2666,7 +2698,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 ImGui::Text("Cannon (WIP)");
                 if (ImGui::BeginChild("CannonSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
                 {
-                    // ImGui::Checkbox("Enable", &cfg.aim.cannon.bEnable);
+                    ImGui::Checkbox("Enable", &cfg.aim.cannon.bEnable);
                     ImGui::Checkbox("Chain Aimbot", &cfg.aim.cannon.b_chain_shots);
                     ImGui::Checkbox("Visible Only", &cfg.aim.cannon.bVisibleOnly);
                     ImGui::SliderFloat("Yaw", &cfg.aim.cannon.fYaw, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
