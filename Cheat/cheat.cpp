@@ -831,6 +831,11 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                         } while (false);
                     }
                 }
+
+
+
+
+
             }
 
             if (cfg.misc.bEnable && !localCharacter->IsLoading())
@@ -1422,6 +1427,54 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             }
                         }
 
+                        if (cfg.visuals.storm.bEnable)
+                        {
+                            
+                            const FVector location = actor->K2_GetActorLocation();
+                            
+                            FVector2D screen;
+                        
+                            
+
+
+
+                            if (cfg.visuals.storm.bName)
+                            {
+                                
+                                auto type = actor->GetName();
+                                if (type.find("Storm") != std::string::npos)
+                                {
+                                    const int dist = localLoc.DistTo(location) * 0.01f;
+
+                                    if (dist > cfg.visuals.storm.drawdistance) continue;
+                                    if (localController->ProjectWorldLocationToScreen(location, screen))
+                                    {
+
+
+                                   
+                                        
+                                        char buf[0x64];
+                                        sprintf(buf, "Storm [%dm]", dist);
+
+
+
+
+                                        Drawing::RenderText(buf,  screen , cfg.visuals.storm.textCol);
+                                        
+
+                                        
+                                    }
+                                }
+                            }
+                        }
+
+
+
+                       
+
+
+                  
+                        
                         if (cfg.visuals.seagulls.bEnable)
                         {
                             if (cfg.visuals.seagulls.bName) 
@@ -1751,7 +1804,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                     const int dist = localLoc.DistTo(origin) * 0.01f;
                                     if (dist > cfg.visuals.animals.drawdistance) continue;
                                     char buf[0x32];
-                                    const int len = displayName->multi(buf, 0x50);
+                                    const int len = displayName->multi(buf, 0x50); 
                                     snprintf(buf + len, sizeof(buf) - len, " [%dm]", dist);
                                     const float adjust = height * 0.05f;
                                     FVector2D pos = { headPos.X, headPos.Y - adjust };
@@ -1759,6 +1812,13 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 }
                             }
                         }
+
+                       
+
+
+
+
+
 
                         if (cfg.visuals.sharks.bEnable && actor->isShark())
                         {
@@ -1785,6 +1845,8 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             }
                         }
 
+                      
+
                         if (cfg.visuals.puzzles.bEnable && actor->isPuzzleVault())
                         {
                             auto vault = reinterpret_cast<APuzzleVault*>(actor);
@@ -1802,6 +1864,10 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 }
                             }
                         }
+
+
+
+
                     }
 
                     if (cfg.misc.client.b_map_pins)
@@ -2626,6 +2692,22 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     ImGui::SliderFloat("Draw Distance", &cfg.visuals.seagulls.drawdistance, 0.f, 20000.f, "%.0f");
                 }
                 ImGui::EndChild();
+
+                
+                ImGui::NextColumn();
+                ImGui::Text("Storm");
+                if (ImGui::BeginChild("StormSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                {
+                    ImGui::Checkbox("Enable", &cfg.visuals.storm.bEnable);
+                    ImGui::Checkbox("Draw Name", &cfg.visuals.storm.bName);
+                    ImGui::ColorEdit4("Text Color", &cfg.visuals.storm.textCol.x, 0);
+                    ImGui::SliderFloat("Draw Distance", &cfg.visuals.storm.drawdistance, 0.f, 15000.f, "%.0f");
+                }
+                ImGui::EndChild();
+                
+
+               
+      
 
                 ImGui::NextColumn();
                 ImGui::Text("Flag");
