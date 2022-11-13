@@ -849,6 +849,15 @@ struct ASlidingDoor {
 	}
 };
 
+enum class ECookingSmokeFeedbackLevel : uint8_t {
+	NotCooking = 0,
+	Raw = 1,
+	CookedWarning = 2,
+	Cooked = 3,
+	BurnedWarning = 4,
+	Burned= 5,
+	ECookingSmokeFeedbackLevel_MAX = 6,
+};
 
 enum class EDrawDebugTrace : uint8_t
 {
@@ -1275,7 +1284,7 @@ struct ACannon {
 
 };
 
-struct UStaticMeshMemoryConstraintComponent
+/*struct UStaticMeshMemoryConstraintComponent
 {
 	char UnknownData_620[0x640]; // 0x620(0x20)
 	struct UMeshMemoryConstraintHandler* Handler; // 0x640(0x08)
@@ -1299,9 +1308,9 @@ struct UStaticMeshMemoryConstraintComponent
 		ProcessEvent(this, fn, &is_finished);
 		return is_finished;
 	}// Function Athena.StaticMeshMemoryConstraintComponent.GetIsMeshFinishedChange // Final|Native|Public|BlueprintCallable|BlueprintPure|Const // @ game+0x3321080
-};
+};*/
 
-struct USkeletalMeshSocket {
+/*struct USkeletalMeshSocket {
 	char pad[0x28];
 	struct FName SocketName; // 0x28(0x08)
 	struct FName BoneName; // 0x30(0x08)
@@ -1322,7 +1331,7 @@ struct USkeletalMeshSocket {
 		ProcessEvent(this, fn, &socket_location);
 		return socket_location;
 	}// Function Engine.SkeletalMeshSocket.GetSocketLocation // Final|RequiredAPI|Native|Public|HasDefaults|BlueprintCallable|BlueprintPure|Const // @ game+0x30a9e30
-};
+};*/
 
 // nemtom ? 
 struct UItemDesc {
@@ -1358,17 +1367,6 @@ struct AHarpoonLauncher {
 		ProcessEvent(this, fn, &params);
 	}
 };
-
-
-
-
-
-
-
-
-
-
-
 
 struct UInventoryManipulatorComponent {
 	bool ConsumeItem(ACharacter* item) {
@@ -1515,6 +1513,7 @@ public:
 
 		SweepHitResult = params.SweepHitResult;
 	}
+
 
 	bool BlueprintUpdateCamera(FVector& NewCameraLocation, FRotator& NewCameraRotation, float& NewCameraFOV)
 	{
@@ -1694,6 +1693,11 @@ public:
 
 	inline bool isMapTable() {
 		static auto obj = UObject::FindClass("Class Athena.MapTable");
+		return IsA(obj);
+	}
+
+	inline bool isCookingPot() {
+		static auto obj = UObject::FindClass("Class Cooking.CookingPot");
 		return IsA(obj);
 	}
 
@@ -2175,6 +2179,100 @@ struct AMapTable
 {
 	char pad[0x04E8];
 	TArray<struct FVector2D> MapPins; // 0x04E8
+};
+
+struct AInteractableBase {
+	char UnknownData_3C8[0x3d8]; // 0x3c8(0x10)
+	bool RequiresFacingFront; // 0x3d8(0x01)
+	bool RequiresNotBeingAirborne; // 0x3d9(0x01)
+	bool RequiresNotSwimming; // 0x3da(0x01)
+	bool InteractionsCanBeDisabled; // 0x3db(0x01)
+	bool CanSetInteractionState; // 0x3dc(0x01)
+	char UnknownData_3DD[0x3]; // 0x3dd(0x03)
+	struct TArray<struct UInteractionPrerequisiteBase*> InteractionPrerequisites; // 0x3e0(0x10)
+	struct UActionRulesComponent* ActionRulesComponent; // 0x3f0(0x08)
+	char InteractableIdentifier; // 0x3f8(0x01)
+	char UnknownData_3F9[0x1]; // 0x3f9(0x01)
+	char CurrentInteractionState; // 0x3fa(0x01)
+	char UnknownData_3FB[0x5]; // 0x3fb(0x05)
+};
+
+struct FCookingClientRepresentation {
+	bool Cooking; // 0x00(0x01)
+	bool HasItem; // 0x01(0x01)
+	char UnknownData_2[0x06]; // 0x02(0x06)
+	struct AItemInfo* CurrentlyCookingItem; // 0x08(0x08)
+	//struct FString CurrentCookingItemDisplayName; // 0x10(0x38)
+	char pad[0x38];
+	struct UClass* CurrentCookingItemCategory; // 0x48(0x08)
+	char SmokeFeedbackLevel; // 0x50(0x01)
+	char UnknownData_51[0x3]; // 0x51(0x03)
+	float VisibleCookedExtent; // 0x54(0x04)
+	float CurrentItemPlacementAngle; // 0x58(0x04)
+	struct FName CurrentCookableTypeName; // 0x5c(0x08)
+	char UnknownData_64[0x4]; // 0x64(0x04)
+};
+
+struct UCookerComponent {
+	char UnknownData_C8[0xd0]; // 0xc8(0x08)
+	struct TArray<struct FStatus> StatusToApplyToContents; // 0xd0(0x10)
+	struct TArray<struct FCookerSmokeFeedbackEntry> VFXFeedback; // 0xe0(0x10)
+	struct UStaticMeshMemoryConstraintComponent* CookableStaticMeshComponent; // 0xf0(0x08)
+	struct USkeletalMeshMemoryConstraintComponent* CookableSkeletalMeshComponent; // 0xf8(0x08)
+	struct FName CookedMaterialParameterName; // 0x100(0x08)
+	struct FName BurnDownDirectionParameterName; // 0x108(0x08)
+	float PlacementVarianceAngleBound; // 0x110(0x04)
+	bool OnByDefault; // 0x114(0x01)
+	char UnknownData_115[0x03]; // 0x115(0x03)
+	struct UCookingComponentAudioParams* AudioParams; // 0x118(0x08)
+	char VfxLocation; // 0x120(0x01)
+	char UnknownData_121[0x7]; // 0x121(0x07)
+	struct AItemInfo* CurrentlyCookingItem; // 0x128(0x08)
+	struct FCookingClientRepresentation CookingState; // 0x130(0x68)
+	struct UParticleSystemComponent* SmokeParticleComponent; // 0x198(0x08)
+	struct UMaterialInstanceDynamic* VisibleCookableMaterial; // 0x1a0(0x08)
+	bool TurnedOn; // 0x1a8(0x01)
+	bool OnIsland; // 0x1a9(0x01)
+	char UnknownData_1AA[0x9e]; // 0x1aa(0x9e)
+
+	void OnRep_CookingState(struct FCookingClientRepresentation OldRepresentation); // Function Cooking.CookerComponent.OnRep_CookingState // Final|Native|Private|HasOutParms // @ game+0x3915310
+};
+
+struct FPlayerStat {
+	uint32_t StatId; // 0x00(0x04)
+};
+
+struct UCookableComponent {
+	char UnknownData_C8[0xe8]; // 0xc8(0x20)
+	struct UClass* NextCookState; // 0xe8(0x08)
+	float TimeToNextCookState; // 0xf0(0x04)
+	char UnknownData_F4[0x4]; // 0xf4(0x04)
+	struct TArray<struct FCookableComponentSmokeFeedbackTimingEntry> SmokeFeedbackLevels; // 0xf8(0x10)
+	struct UCurveFloat* VisibleCookedExtentOverTime; // 0x108(0x08)
+	float DefaultVisibleCookedExtent; // 0x110(0x04)
+	struct FName CookableTypeName; // 0x114(0x08)
+	struct FPlayerStat CookedStat; // 0x11c(0x04)
+	struct FPlayerStat ShipCookedStat; // 0x120(0x04)
+	char CookingState; // 0x124(0x01)
+	char InitialCookingState; // 0x125(0x01)
+	char RemovedCookingState; // 0x126(0x01)
+	bool IgnoreCookedFromRawStats; // 0x127(0x01)
+};
+
+struct ACookingPot {
+	char UnknownData_400[0x408]; // 0x400(0x08)
+	struct UStaticMeshComponent* MeshComponent; // 0x408(0x08)
+	struct UActionRulesInteractableComponent* InteractableComponent; // 0x410(0x08)
+	struct UCookerComponent* CookerComponent; // 0x418(0x08)
+	float HoldToInteractTime; // 0x420(0x04)
+	char UnknownData_424[0x4]; // 0x424(0x04)
+	//struct FString NotWieldingCookableItemTooltip; // 0x428(0x38)
+	//struct FString WieldingCookableItemTooltip; // 0x460(0x38)
+	//struct FString TakeItemTooltip; // 0x498(0x38)
+	//struct FString CannotTakeItemTooltip; // 0x4d0(0x38)
+	//struct FString MixInItemTooltip; // 0x508(0x38)*/
+	char pad[0x118];
+	char UnknownData_540[0xa0]; // 0x540(0xa0)
 };
 
 #ifdef _MSC_VER

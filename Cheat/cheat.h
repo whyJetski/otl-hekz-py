@@ -255,6 +255,7 @@ private:
                 bool bEnable = false;
                 bool bShipInfo = false;
                 bool b_map_pins = false;
+                bool b_cooking_timer = false;
                 float fov = 90.f;   
                 float time = 90.f;
             } client;
@@ -303,6 +304,10 @@ private:
                 float itemdistance = 0.f;
             } others;
         } misc;
+        struct
+        {
+            bool bEnable = false;
+        } fishing;
     } cfg;
     class Hacks {
     private:

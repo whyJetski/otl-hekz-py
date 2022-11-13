@@ -502,7 +502,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
 
         {
             ImGuiIO& io = ImGui::GetIO();
-            static const ImWchar icons_ranges[] = { 0xf000, 0xf3ff, 0 };
+            static const ImWchar icons_ranges[] = { 0xf000, 0xf578, 0 };
             ImFont* font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 17);
             ImFontConfig config;
             config.MergeMode = true;
@@ -719,6 +719,8 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
 
             if (cfg.visuals.bEnable && !localCharacter->IsLoading())
             {
+               
+
                 if (cfg.visuals.client.b_cannon_tracers)
                 {
                     for (int i = 0; i < cannonball_tracers.size(); i++)
@@ -1900,6 +1902,121 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             }
                         }
                     }
+
+                   /* if (cfg.misc.client.b_cooking_timer)
+                    {
+                        if (actor->isCookingPot())
+                        {
+                            if (localCharacter->GetCurrentShip() == actor->GetParentActor())
+                            {
+                                auto pot = reinterpret_cast<ACookingPot*>(actor);
+                            }
+                        }
+                        /*auto pot = reinterpret_cast<ACookingPot*>(actor);
+                        auto cook = pot->CookerComponent->CurrentlyCookingItem;
+
+                        if (pot->CookerComponent->CurrentlyCookingItem)
+                        {
+                            std::wstring cooking_name = pot->CookerComponent->CurrentlyCookingItem->Desc->Title->wide();
+                            //auto const desc = cook->GetItemInfo()->Desc;
+                            if (L"Fish" == cooking_name)
+                            {
+                                char buf[0xFF];
+                                FVector2D pos{ 1.f, 45.f };
+                                ImVec4 col{ 1.f,1.f,1.f,1.f };
+                                pos.Y += 20.f;
+                                Drawing::RenderText("Fish", pos, col, true, false);
+                            }
+                        }
+                    }*/
+
+                    if (cfg.misc.client.b_cooking_timer)
+                    {
+                        auto ship = localCharacter->GetCurrentShip();
+                        if (ship) 
+                        {
+                            if (actor->isCookingPot())
+
+                            {
+                                FVector location = actor->K2_GetActorLocation();
+                                location.Z = 30;
+                                const int dist = localLoc.DistTo(location) * 0.01f;
+                                if (dist < 30) {
+                                    auto pot = reinterpret_cast<ACookingPot*>(actor);
+                                    const auto cooking_state = pot->CookerComponent->CookingState;
+
+                                    ImVec4 col{ 1.f,1.f,1.f,1.f };
+                                    ImVec4 col_warning{ 1.f, 0.f, 0.f, 1.f };
+                                    FVector2D pos{ 1.f, 112.f };
+                                    FVector2D pos_warning{ 1.f, 132.f };
+
+                                    bool warning = false;
+
+                                    const char* text_state;
+                                    if (cooking_state.Cooking)
+                                    {
+                                        if (cooking_state.VisibleCookedExtent < 1)
+                                            text_state = "Raw";
+                                        else if (cooking_state.VisibleCookedExtent == 1)
+                                            text_state = "Almost Cooked";
+                                        else if (cooking_state.VisibleCookedExtent > 1)
+                                        {
+                                            text_state = "Cooked";
+                                            warning = true;
+                                        }
+                                        else if (cooking_state.VisibleCookedExtent > 2)
+                                            text_state = "Burned";
+                                    }
+                                    else {
+                                        text_state = "Not Cooking";
+                                    }
+                                  /*  auto pot = reinterpret_cast<ACookingPot*>(actor);
+                                    auto component = pot->CookerComponent;
+                                    int smoke_level = int(component->CookingState.SmokeFeedbackLevel);
+                                    int cooked_extent = int(component->CookingState.VisibleCookedExtent * 100 / 2);
+
+                                    ImVec4 col_warning{ 1.f, 0.f, 0.f, 1.f };
+                                    FVector2D pos{ 1.f, 112.f };
+                                    ImVec4 col{ 1.f,1.f,1.f,1.f };
+                                    char buf[0x64];
+
+                                    if (smoke_level == 0) {
+                                        sprintf(buf, "Cooking Pot Empty [%dm] %d", dist, smoke_level);
+                                    }
+                                    else {
+                                        if (cooked_extent == 0) sprintf(buf, "Raw [%dm]", dist);
+                                        if (cooked_extent > 0) sprintf(buf, "Undercooked");
+                                        if (cooked_extent > 50) sprintf(buf, "Cooked");
+                                        //if (cooked_extent > 50 && cooked_extent < 101) sprintf(buf, "Cooked");// Drawing::RenderText(buf, pos, col_warning, true, false);
+                                        if (cooked_extent > 100) sprintf(buf, "Burned");
+                                    }*/
+                                    //const char* c = text_state.c_str();
+                                    Drawing::RenderText(text_state, pos, col, true, false);
+                                    if (warning)
+                                    {
+                                        const char* warning_text;
+                                        warning_text = "Ready!";
+                                        Drawing::RenderText(warning_text, pos_warning, col_warning, true, false);
+                                        //Drawing::RenderText(buf, pos_time, col_warning, true, false);
+                                    }
+                                }
+                            }
+                           //if (actor->isItem())
+                            //{
+                              /*  auto type = actor->GetName();
+                                FVector2D pos_time{ 1.f, 152.f };
+                                ImVec4 col_time{ 1.f, 0.f, 0.f, 1.f };
+                                if (type.find("BP_fod") != std::string::npos)
+                                {
+                                    auto comp = reinterpret_cast<UCookableComponent*>(actor);
+                                    const auto time = comp->TimeToNextCookState;
+                                    char buf[0x64];
+                                    sprintf(buf, "%f", time);
+                                    Drawing::RenderText(buf, pos_time, col_time, true, false);
+                                }
+                           //}*/
+                        }
+                    }
                     
                     if (ImGui::IsKeyPressed(VK_F10))
                     {
@@ -1928,6 +2045,12 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             float NewCameraFOV = 0.f;
                             localCharacter->BlueprintUpdateCamera(NewCameraLocation, NewCameraRotation, NewCameraFOV);
                         }
+                    }
+
+                    if (cfg.fishing.bEnable)
+                    {
+
+
                     }
 
                     if (cfg.aim.bEnable)
@@ -2781,8 +2904,11 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 if (ImGui::BeginChild("CannonSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
                 {
                     ImGui::Checkbox("Enable", &cfg.aim.cannon.bEnable);
-                    ImGui::Checkbox("Chain Aimbot", &cfg.aim.cannon.b_chain_shots);
+                    ImGui::Checkbox("Chain Aimbot (Auto Detects)", &cfg.aim.cannon.b_chain_shots);
                     ImGui::Checkbox("Visible Only", &cfg.aim.cannon.bVisibleOnly);
+                    ImGui::Checkbox("Insta", &cfg.aim.cannon.b_instant_shoot);
+                    ImGui::Checkbox("Aim At Players", &cfg.aim.cannon.playeraimbot);
+                    ImGui::Checkbox("Aim At Skeletons", &cfg.aim.cannon.skeletonaimbot);
                     ImGui::SliderFloat("Yaw", &cfg.aim.cannon.fYaw, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
                     ImGui::SliderFloat("Pitch", &cfg.aim.cannon.fPitch, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
                 }
@@ -2808,6 +2934,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     ImGui::Checkbox("Enable", &cfg.misc.client.bEnable);
                     ImGui::Checkbox("Ship Info", &cfg.misc.client.bShipInfo);
                     ImGui::Checkbox("Map Pins", &cfg.misc.client.b_map_pins);
+                    ImGui::Checkbox("Cooking Timer", &cfg.misc.client.b_cooking_timer);
                     ImGui::SliderFloat("FOV", &cfg.misc.client.fov, 90.f, 180.f, "%.0f");
                     //ImGui::SliderFloat("Time", &cfg.misc.client.time, 0, 24, "%.0f");
 
@@ -2886,6 +3013,20 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 ImGui::NextColumn();
 
                 ImGui::EndTabItem();
+            }
+            //ImGui::EndTabBar();
+            if (ImGui::BeginTabItem(ICON_FA_FISH " Fishing")) {
+
+                ImGui::Text("Fishing");
+                if (ImGui::BeginChild("Fishing bot", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                {
+                }
+
+                    ImGui::EndChild();
+
+                    ImGui::NextColumn();
+
+                    ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
         };
