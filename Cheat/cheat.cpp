@@ -1077,64 +1077,67 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 }
                 if (cfg.fishing.bEnable)
                 {
-                    if (item->isFishingRod())
+                    if (item)
                     {
-                        auto const localRod = *reinterpret_cast<AFishingRod**>(&item);
-                        auto serverstate = localRod->ServerState;
-
-
-                       /* if (serverstate == 0)
+                        if (item->isFishingRod())
                         {
-                            mouse_event(0x0002, 0, 0, 0, 0);
-                            Sleep(500);
-                            mouse_event(0x0004, 0, 0, 0, 0);
-                        }*/
-
-                        if (localRod->ReplicatedFishState.FishingFishState == 4)
-                        {
-                            Logger::Log("4\n");
-                            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                             //localRod->Server_ToggleReeling(true);
-                        }
+                            auto const localRod = *reinterpret_cast<AFishingRod**>(&item);
+                            auto serverstate = localRod->ServerState;
 
 
-                        else if (localRod->ReplicatedFishState.FishingFishState == 3)
-                        {
+                            /* if (serverstate == 0)
+                             {
+                                 mouse_event(0x0002, 0, 0, 0, 0);
+                                 Sleep(500);
+                                 mouse_event(0x0004, 0, 0, 0, 0);
+                             }*/
 
-                            //Logger::Log("3\n");
-                            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-                             //localRod->Server_ToggleReeling(false);
-                            if (localRod->FishingFloatOffset.X > -500.f && localRod->FishingFloatOffset.X < 500.f) // Direction = Up
+                            if (localRod->ReplicatedFishState.FishingFishState == 4)
                             {
-                                Logger::Log("Up\n");
+                                Logger::Log("4\n");
+                                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                                //localRod->Server_ToggleReeling(true);
+                            }
+
+
+                            else if (localRod->ReplicatedFishState.FishingFishState == 3)
+                            {
+
+                                //Logger::Log("3\n");
+                                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                                //localRod->Server_ToggleReeling(false);
+                                if (localRod->FishingFloatOffset.Y > -300.f && localRod->FishingFloatOffset.Y < 300.f) // Direction = Up
+                                {
+                                    //Logger::Log("Up\n");
+                                    keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                    keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                    keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                                }
+                                else if (localRod->FishingFloatOffset.Y < -300.f) // Direction = Left
+                                {
+                                    //Logger::Log("Left\n");
+                                    keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                    keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                    keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                                }
+                                else if (localRod->FishingFloatOffset.Y > 300.f) // Direction = Right
+                                {
+                                    //Logger::Log("Right\n");
+                                    keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                    keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                    keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                                }
+                            }
+
+                            else if (localRod->ReplicatedFishState.FishingFishState == 5 && !localRod->PlayerIsBattlingFish)
+                            {
+                                //Logger::Log("5\n");
+                                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
                                 keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
                                 keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                                // Press all the keys up, disable the feature
                             }
-                            else if (localRod->FishingFloatOffset.X < -500.f) // Direction = Left
-                            {
-                                Logger::Log("Left\n");
-                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
-                            }
-                            else if (localRod->FishingFloatOffset.X > 500.f) // Direction = Right
-                            {
-                                Logger::Log("Right\n");
-                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
-                            }
-                        }
-
-                        else if (localRod->ReplicatedFishState.FishingFishState == 5 && !localRod->PlayerIsBattlingFish)
-                        {
-                            Logger::Log("5\n");
-                            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-                            keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                            keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                            keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                              // Press all the keys up, disable the feature
                         }
                     }
                 }
