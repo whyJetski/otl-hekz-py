@@ -1703,6 +1703,11 @@ public:
 		return IsA(obj);
 	}
 
+	inline bool isFishingRod() {
+		static auto obj = UObject::FindClass("Class Athena.FishingRod");
+		return IsA(obj);
+	}
+
 	inline bool isCannon() {
 		static auto obj = UObject::FindClass("Class Athena.Cannon");
 		return IsA(obj);
@@ -2256,6 +2261,193 @@ struct ACookingPot {
 	//struct FString MixInItemTooltip; // 0x508(0x38)*/
 	char pad[0x118];
 	char UnknownData_540[0xa0]; // 0x540(0xa0)
+};
+
+struct FFishingMiniGameData {
+	struct UFishingMiniGameSetupDataAsset* SetupDataAsset; // 0x00(0x08)
+	struct UFishingMiniGameFishDataAsset* FishDataAsset; // 0x08(0x08)
+};
+
+struct FFishingMiniGame {
+	struct FFishingMiniGameData Data; // 0x00(0x10)
+	char UnknownData_10[0x40]; // 0x10(0x40)
+};
+
+struct FFishingMiniGamePlayerInput {
+	char InputDirection; // 0x00(0x01)
+	char BattlingDirection; // 0x01(0x01)
+	bool IsReeling; // 0x02(0x01)
+};
+
+enum class EFishingFishState : uint8_t {
+	NotSet = 0,
+	RisingFromTheDepths = 1,
+	AttachedToFloat_MovingToFloat = 2,
+	AttachedToFloat_Battling = 3,
+	AttachedToFloat_Tired = 4,
+	AttachedToFloat_Caught = 5,
+	AttachedToFloat_Caught_Instant = 6,
+	Escaping = 7,
+	EFishingFishState_MAX = 8,
+};
+
+struct AFishingFish : ACharacter {
+	char UnknownData_5E0[0x5f0]; // 0x5e0(0x10)
+	struct UFishDataAsset* FishDataAsset; // 0x5f0(0x08)
+	struct UFishingMiniGameFishDataAsset* FishingMiniGameFishDataAsset; // 0x5f8(0x08)
+	struct UParticleSystemComponent* BattlingVFX; // 0x600(0x08)
+	struct UParticleSystemComponent* BeingTiredVFX; // 0x608(0x08)
+	struct UWaterInteractionComponent* WaterInteractionComponent; // 0x610(0x08)
+	struct UClass* CaughtFishItemDesc; // 0x618(0x08)
+	char UnknownData_620[0x290]; // 0x620(0x290)
+	struct UDitherComponent* DitherComponent; // 0x8b0(0x08)
+	struct FVector MouthAttachLocation; // 0x8b8(0x0c)
+	float AutoKillTime; // 0x8c4(0x04)
+	char UnknownData_8C8[0x8]; // 0x8c8(0x08)
+	int32_t RandomAnimationLoopVal; // 0x8d0(0x04)
+	char UnknownData_8D4[0x3c]; // 0x8d4(0x3c)
+
+	void Multicast_SetVisible(); // Function Athena.FishingFish.Multicast_SetVisible // Net|NetReliableNative|Event|NetMulticast|Public // @ game+0x3d908c0
+};
+
+struct FFishingRodReplicatedFishState {
+	struct AFishingFish* FishingFish; // 0x00(0x08)
+	char FishingFishState; // 0x08(0x01)
+	bool FishHasEscaped; // 0x09(0x01)
+	char UnknownData_A[0x6]; // 0x0a(0x06)
+};
+
+struct FFishingFishSelector {
+	struct UAvailableFishForSpawning* AvailableFish; // 0x00(0x08)
+	char UnknownData_8[0xa8]; // 0x08(0xa8)
+	struct TArray<struct UFishSpawnParamsDataAsset*> SelectedFishCache; // 0xb0(0x10)
+	struct UObject* Root; // 0xc0(0x08)
+	struct UFishSpawnParamsDataAsset* GatheredConditions; // 0xc8(0x08)
+	struct UVoyageLocationOnlyNamedIslandListDataAsset* GatheredIsland; // 0xd0(0x08)
+};
+
+struct AFishingRod {
+	char UnknownData_780[0x7a0]; // 0x780(0x20)
+	struct UClass* AuxiliaryRadialCategoryFilter; // 0x7a0(0x08)
+	struct TArray<struct UClass*> AuxiliaryRadialAllowedItems; // 0x7a8(0x10)
+	struct UInventoryItemComponent* InventoryItem; // 0x7b8(0x08)
+	struct FFishingFishSelector FishSelector; // 0x7c0(0xd8)
+	struct UFishingRodSetupDataAsset* FishingRodSetupDataAsset; // 0x898(0x08)
+	struct UFishingSetupDataAsset* FishingSetupDataAssetInToSea; // 0x8a0(0x08)
+	struct UFishingSetupDataAsset* FishingSetupDataAssetInToPond; // 0x8a8(0x08)
+	struct UFishingMiniGameSetupDataAsset* FishingMiniGameSetupDataAssetInToSea; // 0x8b0(0x08)
+	struct UFishingMiniGameSetupDataAsset* FishingMiniGameSetupDataAssetInToPond; // 0x8b8(0x08)
+	struct UFishingFreeLookConstrainsDataAsset* FishingFreeLookConstrainsDataAsset; // 0x8c0(0x08)
+	struct UMaterialManipulationComponent* MaterialManipulationComponent; // 0x8c8(0x08)
+	struct UFishingLineRenderComponent* Rope; // 0x8d0(0x08)
+	struct FVector InteractionPointOffset; // 0x8d8(0x0c)
+	char UnknownData_8E4[0x4]; // 0x8e4(0x04)
+	struct UClass* StatTriggerForCatchingAFish; // 0x8e8(0x08)
+	char ServerState; // 0x8f0(0x01)
+	bool IsReeling; // 0x8f1(0x01)
+	char UnknownData_8F2[0x6]; // 0x8f2(0x06)
+	struct FFishingRodReplicatedFishState ReplicatedFishState; // 0x8f8(0x10)
+	struct AActor* FishInteractionProxy; // 0x908(0x08)
+	struct FFishingMiniGamePlayerInput FishingMiniGamePlayerInput; // 0x910(0x03)
+	bool PlayerIsBattlingFish; // 0x913(0x01)
+	char UnknownData_914[0x4]; // 0x914(0x04)
+	struct AItemProxy* BaitOnFloat; // 0x918(0x08)
+	struct FVector FishingFloatRelativeCentreLocation; // 0x920(0x0c)
+	struct FVector FishingFloatOffset; // 0x92c(0x0c)
+	bool CastIsInToAPond; // 0x938(0x01)
+	char UnknownData_939[0x7]; // 0x939(0x07)
+	struct UClass* CaughtFishClass; // 0x940(0x08)
+	char BaitOnRodType; // 0x948(0x01)
+	char BattlingState; // 0x949(0x01)
+	char UnknownData_94A[0x6]; // 0x94a(0x06)
+	struct AItemProxy* ComedyItemOnFloat; // 0x950(0x08)
+	struct UClass* CaughtComedyItemDesc; // 0x958(0x08)
+	float TimeReelingWhenBattlingBeforeSnapping; // 0x960(0x04)
+	float FishingMiniGamePercentageInToEscaping; // 0x964(0x04)
+	float MinimumDistanceFromPlayer; // 0x968(0x04)
+	char UnknownData_96C[0x4]; // 0x96c(0x04)
+	struct AActor* FishingFloatActor; // 0x970(0x08)
+	struct AItemProxy* LocalOnlyBaitOnFloat; // 0x978(0x08)
+	struct FFishingMiniGame FishingMiniGame; // 0x980(0x50)
+	struct AFishingFish* NonReplicatedLocalFishingFishOnRod; // 0x9d0(0x08)
+	struct AItemProxy* LocalOnlyComedyItemOnFloat; // 0x9d8(0x08)
+	bool IsInFishingActionState; // 0x9e0(0x01)
+	char UnknownData_9E1[0x1af]; // 0x9e1(0x1af)
+
+	void Server_ToggleReeling(bool Reeling);// Function Athena.FishingRod.Server_ToggleReeling // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90fb0
+	void Server_SetAreFishingAnimationsLoaded(bool InAreAnimsLoaded); // Function Athena.FishingRod.Server_SetAreFishingAnimationsLoaded // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90ef0
+	void Server_PlayerHasDetectedABlockedLine(); // Function Athena.FishingRod.Server_PlayerHasDetectedABlockedLine // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90ea0
+	void Server_PlayerHasDetectedABlockedFish(); // Function Athena.FishingRod.Server_PlayerHasDetectedABlockedFish // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90e50
+	void Server_EndPreCasting(float Duration); // Function Athena.FishingRod.Server_EndPreCasting // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90da0
+	void Server_BeginPreCasting(); // Function Athena.FishingRod.Server_BeginPreCasting // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90d50
+	void Server_BattlingStateChanged(char InputDirection, char BattlingDirection); // Function Athena.FishingRod.Server_BattlingStateChanged // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90c60
+	void Server_AddBaitToFloat(struct AItemInfo* SelectedItem); // Function Athena.FishingRod.Server_AddBaitToFloat // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90ba0
+	void OnRep_ServerState(); // Function Athena.FishingRod.OnRep_ServerState // Final|Native|Private // @ game+0x3d90aa0
+	void OnRep_ReplicatedFishState(struct FFishingRodReplicatedFishState PreviousReplicatedFishState); // Function Athena.FishingRod.OnRep_ReplicatedFishState // Final|Native|Private|HasOutParms // @ game+0x3d90a00
+	void OnRep_PlayerIsBattlingFish(); // Function Athena.FishingRod.OnRep_PlayerIsBattlingFish // Final|Native|Private // @ game+0x3d909e0
+	void OnRep_FishInteractionProxy(); // Function Athena.FishingRod.OnRep_FishInteractionProxy // Final|Native|Private // @ game+0x3d909a0
+	void OnRep_FishingMiniGamePlayerInput(); // Function Athena.FishingRod.OnRep_FishingMiniGamePlayerInput // Final|Native|Private // @ game+0x3d909c0
+	void OnRep_ComedyItemOnFloat(); // Function Athena.FishingRod.OnRep_ComedyItemOnFloat // Final|Native|Private // @ game+0x3d90980
+	void OnRep_CaughtFishClass(); // Function Athena.FishingRod.OnRep_CaughtFishClass // Final|Native|Private // @ game+0x3d90960
+	void OnRep_BattlingState(); // Function Athena.FishingRod.OnRep_BattlingState // Final|Native|Private // @ game+0x3d90940
+	void OnRep_BaitOnRodType(); // Function Athena.FishingRod.OnRep_BaitOnRodType // Final|Native|Private // @ game+0x3d90920
+	void OnRep_BaitOnFloat(); // Function Athena.FishingRod.OnRep_BaitOnFloat // Final|Native|Private // @ game+0x3d90900
+	void OnComedyItemDestroyed(); // Function Athena.FishingRod.OnComedyItemDestroyed // Final|Native|Private // @ game+0x3d908e0
+	void Multicast_RetractLine(char FishingRodRetractLineVisuals); // Function Athena.FishingRod.Multicast_RetractLine // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d90840
+	void Multicast_RemoveFishInstant(); // Function Athena.FishingRod.Multicast_RemoveFishInstant // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d90820
+	void Multicast_RemoveFishFromLine(); // Function Athena.FishingRod.Multicast_RemoveFishFromLine // Final|Net|Native|Event|NetMulticast|Private // @ game+0x3d90800
+	void Multicast_FishEscaped(); // Function Athena.FishingRod.Multicast_FishEscaped // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d907e0
+	void Multicast_BringInACatch(bool IsComedyItem); // Function Athena.FishingRod.Multicast_BringInACatch // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d90750
+};
+
+enum class EFishingRodServerState : uint8_t {
+	NotBeingUsed,
+	PreparingToCast,
+	VerifyingCastLocation,
+	Casting,
+	DelayBeforeSpawningFish,
+	RequestFishSpawnWhenPossible,
+	WaitingForAsyncLoadToFinish,
+	WaitingForFishToBite,
+	FishMovingInToBite,
+	FishOnRodAndWaitingForPlayerInput,
+	FishMovingToMinimumDistanceFromPlayer,
+	FishingMiniGameUnderway,
+	FishCaught,
+	ReelingInAComedyItem,
+	ComedyItemCaught,
+	EFishingRodServerState_MAX,
+};
+
+struct UScriptStruct : UStruct {
+	char UnknownData_88[0x98]; // 0x88(0x10)
+};
+
+struct FSerialisedRpc
+{
+	unsigned char                                      UnknownData00[0x18];                                      // 0x0000(0x0018) MISSED OFFSET
+	class UScriptStruct* ContentsType;                                             // 0x0018(0x0008) (ZeroConstructor, IsPlainOldData)
+};
+
+struct UBoxedRpcDispatcherComponent{
+	char UnknownData_C8[0xD0]; // 0xc8(0x08)
+
+	void Server_SendRpc(struct FSerialisedRpc Event); // Function AthenaEngine.BoxedRpcDispatcherComponent.Server_SendRpc // Net|NetReliableNative|Event|Protected|NetServer|NetValidate // @ game+0x3176dc0
+	void NetMulticastExcludeServer_SendRpc(struct FSerialisedRpc Event); // Function AthenaEngine.BoxedRpcDispatcherComponent.NetMulticastExcludeServer_SendRpc // Net|NetReliableNative|Event|NetMulticast|Protected // @ game+0x3176c90
+	void Client_SendRpc(struct FSerialisedRpc Event); // Function AthenaEngine.BoxedRpcDispatcherComponent.Client_SendRpc // Net|NetReliableNative|Event|Protected|NetClient // @ game+0x31769a0
+};
+
+struct FBoxedRpc {
+	char UnknownData_0[0x8]; // 0x00(0x08)
+	struct UScriptStruct* Type; // 0x08(0x08)
+};
+
+struct FThrowGrenadeRpc : FBoxedRpc {
+	char pad[0x10];
+	struct FVector RelativeLocalThrowLocation; // 0x10(0x0c)
+	struct FRotator LocalLaunchAngle; // 0x1c(0x0c)
+	float LocalLaunchSpeed; // 0x28(0x04)
+	struct FVector LocalWielderVelocity; // 0x2c(0x0c)
 };
 
 #ifdef _MSC_VER

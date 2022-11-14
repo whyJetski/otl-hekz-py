@@ -69,17 +69,40 @@ namespace fs = std::filesystem;
 
 void Cheat::Hacks::OnWeaponFiredHook(UINT64 arg1, UINT64 arg2)
 {
-    Logger::Log("arg1: %p, arg2: %p\n", arg1, arg2);
+    /*Logger::Log("arg1: %p, arg2: %p\n", arg1, arg2);
     auto& cameraCache = cache.localCamera->CameraCache.POV;
     auto prev = cameraCache.Rotation;
     cameraCache.Rotation = { -cameraCache.Rotation.Pitch, -cameraCache.Rotation.Yaw, 0.f };
+    float ProjectileDistributionMaxAngle;*/
+
     return OnWeaponFiredOriginal(arg1, arg2);
 }
 
+int32_t targetFunctionIndex = -1;
 
 void Cheat::Hacks::ProcessEventHook(void* obj, UFunction* function, void* parms)
 {
-    Logger::Log("ProcessEvent: %s with id %d\n", function->GetFullName().c_str(), function->Name.ComparisonIndex);
+    //Logger::Log("ProcessEvent: %s with id %d\n", function->GetFullName().c_str(), function->Name.ComparisonIndex);
+
+    if (targetFunctionIndex == -1)
+        if (function->GetFullName().compare("Function AthenaEngine.BoxedRpcDispatcherComponent.Server_SendRpc") == 0)
+            targetFunctionIndex = function->InternalIndex;
+    
+    if (function->InternalIndex == targetFunctionIndex)
+    {
+        auto result = (FSerialisedRpc*)parms;
+
+        if (result->ContentsType->GetFullName().find("ScriptStruct Athena.TakeItemFromContainerRPC") != std::string::npos)
+        {
+            Logger::Log("asd\n");
+           // return;
+        }
+        if (result->ContentsType->GetFullName().find("ScriptStruct Athena.ProjectileWeaponFireInaccuracySeedMismatchTelemetryEvent") != std::string::npos)
+        {
+            Logger::Log("asd\n");
+            //return;
+        }
+    }
 
     ProcessEventOriginal(obj, function, parms);
 }
@@ -106,26 +129,30 @@ void Cheat::Hacks::Init()
     //fn = UObject::FindObject<UFunction>("Function Athena.AthenaPlayerCharacter.OnWieldedItem");
     //Logger::Log("OnWieldedItem: 0x%llX\n", fn->Func);
     //
-    //fn = UObject::FindObject<UFunction>("Function Athena.ProjectileWeapon.OnWeaponFired");
-    //Logger::Log("OnWeaponFired: 0x%llX\n", fn->Func);
+    /*fn = UObject::FindObject<UFunction>("Function Athena.ProjectileWeapon.OnWeaponFired");
+    Logger::Log("OnWeaponFired: 0x%llX\n", fn->Func);
+    SetHook((void*)0x7FF727EB7150, OnWeaponFiredHook, reinterpret_cast<void**>(&OnWeaponFiredOriginal));*/
     //
     //fn = UObject::FindObject<UFunction>("Function Engine.PlayerController.AddPitchInput");
     //Logger::Log("AddPitchInput: 0x%llX\n", fn->Func);
 
 
-    //UClass* klass = UObject::FindObject<UClass>("Class Athena.ProjectileWeapon");
-    //Logger::Log("Class Athena.ProjectileWeapon: 0x%llX\n", klass);
-    //void* vtable_raw = klass->Vtable;
-    //Logger::Log("Vtable: 0x%llX\n", vtable_raw);
-    //UINT64* vtable_uint64 = (UINT64*)vtable_raw;
-    //Logger::Log("ProcessEvent: 0x%llX\n", vtable_uint64[59]);
-    //SetHook((void*)0x7FF661E32190, ProcessEventHook, reinterpret_cast<void**>(&ProcessEventOriginal));
+    /*UClass* klass = UObject::FindObject<UClass>("Class Athena.ProjectileWeapon");
+    Logger::Log("Class Athena.ProjectileWeapon: 0x%llX\n", klass);
+    void* vtable_raw = klass->Vtable;
+    Logger::Log("Vtable: 0x%llX\n", vtable_raw);
+    UINT64* vtable_uint64 = (UINT64*)vtable_raw;
+    Logger::Log("ProcessEvent: 0x%llX\n", vtable_uint64[55]);
+    SetHook((void*)0x7FF728508410, ProcessEventHook, reinterpret_cast<void**>(&ProcessEventOriginal));
+    */
+
 }
 
 inline void Cheat::Hacks::Remove()
 {
     //RemoveHook(CanFireOriginal);
-    //RemoveHook(ProcessEventOriginal);
+   //RemoveHook(OnWeaponFiredOriginal);
+   // RemoveHook(ProcessEventOriginal);
 }
 
 void Cheat::Renderer::Drawing::RenderText(const char* text, const FVector2D& pos, const ImVec4& color, const bool outlined = false, const bool centered = true)
@@ -322,7 +349,7 @@ bool GetProjectilePath(std::vector<FVector>& v, FVector& Vel, FVector& Pos, floa
 {
     float interval = 0.033f;
 
-    for (unsigned int i = 0; i < 250; ++i)
+    for (unsigned int i = 0; i < 200; ++i) //i<250
     {
         v.push_back(Pos);
         FVector move;
@@ -679,7 +706,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     vel = vel + localCharacter->GetCurrentShip()->GetVelocity();
 
                 std::vector<FVector> path;
-                int count = 250;
+                int count = 200; //250
 
                 bool hit = GetProjectilePath(path, vel, pos, gravity, count, world);
 
@@ -879,7 +906,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     if (milliseconds_now() >= desiredTime)
                     {
                         int return_value = (int)localCharacter->GetTargetFOV(AACharacter);;
-                        // Logger::Log("return_value = %d\n", return_value); // Print return_value
+                        //Logger::Log("return_value = %d\n", return_value); // Print return_value
                         //localController->SetTime(cfg.misc.client.time);
                         localController->FOV(cfg.misc.client.fov);
                         if (return_value == 17.f) //spyglass
@@ -1018,6 +1045,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 {
                     if (cfg.misc.allweapons.fasterreloading)
                     {
+                        /*
                         localWeapon->WeaponParameters.EquipDuration = -1.f;
                         localWeapon->WeaponParameters.RecoilDuration = 0.07f;
                         localWeapon->WeaponParameters.SecondsUntilZoomStarts = -1.f; // EYE OF REACH SCOPE FIX
@@ -1025,11 +1053,13 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                         localWeapon->WeaponParameters.ZoomedRecoilDurationIncrease = -10.f;
                         localWeapon->WeaponParameters.IntoAimingDuration = -1.f;
                         localWeapon->WeaponParameters.TimeoutTolerance = -10.f;
+                        //localWeapon->WeaponParameters.ProjectileDistributionMaxAngle = -180.f;*/
+                        
                     }
 
                     if (cfg.misc.allweapons.fasteraimingspeed)
                     {
-                        localWeapon->WeaponParameters.AimingMoveSpeedScalar = 200.f;
+                        //localWeapon->WeaponParameters.AimingMoveSpeedScalar = 200.f;
                     }
                 }
                 
@@ -1038,6 +1068,69 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     if (cfg.misc.others.fasterharpoon && attachObject->isHarpoon())
                     {
                         
+                    }
+                }
+                if (cfg.fishing.bEnable)
+                {
+                    if (item->isFishingRod())
+                    {
+                        auto const localRod = *reinterpret_cast<AFishingRod**>(&item);
+                        auto serverstate = localRod->ServerState;
+
+
+                       /* if (serverstate == 0)
+                        {
+                            mouse_event(0x0002, 0, 0, 0, 0);
+                            Sleep(500);
+                            mouse_event(0x0004, 0, 0, 0, 0);
+                        }*/
+
+                        if (localRod->ReplicatedFishState.FishingFishState == 4)
+                        {
+                            Logger::Log("4\n");
+                            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                             //localRod->Server_ToggleReeling(true);
+                        }
+
+
+                        else if (localRod->ReplicatedFishState.FishingFishState == 3)
+                        {
+
+                            //Logger::Log("3\n");
+                            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                             //localRod->Server_ToggleReeling(false);
+                            if (localRod->FishingFloatOffset.X > -500.f && localRod->FishingFloatOffset.X < 500.f) // Direction = Up
+                            {
+                                Logger::Log("Up\n");
+                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                            }
+                            else if (localRod->FishingFloatOffset.X < -500.f) // Direction = Left
+                            {
+                                Logger::Log("Left\n");
+                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                            }
+                            else if (localRod->FishingFloatOffset.X > 500.f) // Direction = Right
+                            {
+                                Logger::Log("Right\n");
+                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                            }
+                        }
+
+                        else if (localRod->ReplicatedFishState.FishingFishState == 5 && !localRod->PlayerIsBattlingFish)
+                        {
+                            Logger::Log("5\n");
+                            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                            keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                            keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                            keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                              // Press all the keys up, disable the feature
+                        }
                     }
                 }
             }
@@ -1441,6 +1534,18 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                         sprintf(buf, "Seagulls [%dm]", dist);
                                         Drawing::RenderText(buf, screen, cfg.visuals.seagulls.textCol);
                                     }
+                                }
+                                if (type.find("GhostShipRewardMarker") != std::string::npos)
+                                {
+                                    const int dist = localLoc.DistTo(location) * 0.01f;
+                                    if (dist > cfg.visuals.seagulls.drawdistance) continue;
+                                    if (localController->ProjectWorldLocationToScreen(location, screen))
+                                    {
+                                        char buf[0x64];
+                                        sprintf(buf, "OOS Reward [%dm]", dist);
+                                        Drawing::RenderText(buf, screen, cfg.visuals.seagulls.textCol);
+                                    }
+
                                 }
                                 // EMISSARY FLAG TEST :D
                                /* if (type.find("EmissaryFlotsam") != std::string::npos)
@@ -1981,11 +2086,38 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                         }
                     }
 
-                    if (cfg.fishing.bEnable)
+                    /*if (cfg.fishing.bEnable)
                     {
+                        if (item->isFishingRod())
+                        {
+                            auto const localRod = *reinterpret_cast<AFishingRod**>(&item);
+                            auto serverstate = localRod->ServerState;
 
 
-                    }
+                            if (localRod->ReplicatedFishState.FishingFishState == 4)
+                            {
+                                Logger::Log("4");
+                               // mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
+                                //localRod->Server_ToggleReeling(true);
+                            }
+
+
+                            else if (localRod->ReplicatedFishState.FishingFishState == 3)
+                            {
+                                
+                                Logger::Log("3");
+                               // mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+                                //localRod->Server_ToggleReeling(false);
+                            }
+
+                            else if (localRod->ReplicatedFishState.FishingFishState == 5 && !localRod->PlayerIsBattlingFish)
+                            {
+                                Logger::Log("5");
+                              //  mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+                                // Press all the keys up, disable the feature
+                            }
+                        }
+                    }*/
 
                     if (cfg.aim.bEnable)
                     {
@@ -2854,7 +2986,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     ImGui::Checkbox("Map Pins", &cfg.misc.client.b_map_pins);
                     ImGui::Checkbox("Cooking Timer", &cfg.misc.client.b_cooking_timer);
                     ImGui::SliderFloat("FOV", &cfg.misc.client.fov, 90.f, 180.f, "%.0f");
-                    //ImGui::SliderFloat("Time", &cfg.misc.client.time, 0, 24, "%.0f");
+                    //ImGui::SliderInt("Time", &cfg.misc.client.time, 0, 24, "%.0f");
 
                     ImGui::Separator();
                     if (ImGui::Button("Save Settings"))
@@ -2930,6 +3062,17 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
 
                 ImGui::NextColumn();
 
+                ImGui::Text("Weapons");
+                if (ImGui::BeginChild("Weapon Settings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                {
+                    ImGui::Checkbox("Enable", &cfg.misc.allweapons.bEnable);
+                    ImGui::Checkbox("No Spread", &cfg.misc.allweapons.fasterreloading);
+                    ImGui::Checkbox("Faster Aiming", &cfg.misc.allweapons.fasteraimingspeed);
+                }
+                ImGui::EndChild();
+
+                ImGui::NextColumn();
+
                 ImGui::EndTabItem();
             }
             //ImGui::EndTabBar();
@@ -2938,8 +3081,15 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 ImGui::Text("Fishing");
                 if (ImGui::BeginChild("Fishing bot", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
                 {
+                    ImGui::Checkbox("Enable", &cfg.fishing.bEnable);
                 }
+                ImGui::EndChild();
 
+                ImGui::Columns(3, "CLM1", false);
+                ImGui::Text("Fishing");
+                if (ImGui::BeginChild("FishingSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                {
+                }
                     ImGui::EndChild();
 
                     ImGui::NextColumn();
