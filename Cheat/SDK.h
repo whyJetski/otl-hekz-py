@@ -2391,7 +2391,16 @@ struct AFishingRod {
 	bool IsInFishingActionState; // 0x9e0(0x01)
 	char UnknownData_9E1[0x1af]; // 0x9e1(0x1af)
 
-	void Server_ToggleReeling(bool Reeling);// Function Athena.FishingRod.Server_ToggleReeling // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90fb0
+	//void Server_ToggleReeling(bool Reeling);// Function Athena.FishingRod.Server_ToggleReeling // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90fb0
+	void Server_ToggleReeling(bool Reeling)
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Athena.FishingRod.Server_ToggleReeling");
+		struct {
+			bool Reeling = false;
+		} params;
+		params.Reeling = Reeling;
+		ProcessEvent(this, fn, &params);
+	}
 	void Server_SetAreFishingAnimationsLoaded(bool InAreAnimsLoaded); // Function Athena.FishingRod.Server_SetAreFishingAnimationsLoaded // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90ef0
 	void Server_PlayerHasDetectedABlockedLine(); // Function Athena.FishingRod.Server_PlayerHasDetectedABlockedLine // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90ea0
 	void Server_PlayerHasDetectedABlockedFish(); // Function Athena.FishingRod.Server_PlayerHasDetectedABlockedFish // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90e50

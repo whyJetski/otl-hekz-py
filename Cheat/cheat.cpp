@@ -349,7 +349,7 @@ bool GetProjectilePath(std::vector<FVector>& v, FVector& Vel, FVector& Pos, floa
 {
     float interval = 0.033f;
 
-    for (unsigned int i = 0; i < 200; ++i) //i<250
+    for (unsigned int i = 0; i < count; ++i) //i<250
     {
         v.push_back(Pos);
         FVector move;
@@ -706,7 +706,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     vel = vel + localCharacter->GetCurrentShip()->GetVelocity();
 
                 std::vector<FVector> path;
-                int count = 200; //250
+                int count = 250; //250
 
                 bool hit = GetProjectilePath(path, vel, pos, gravity, count, world);
 
@@ -1094,8 +1094,15 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
 
                             if (localRod->ReplicatedFishState.FishingFishState == 4)
                             {
-                                Logger::Log("4\n");
-                                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                                //Logger::Log("4\n");
+                                //mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                                static std::uintptr_t desiredTime = 0;
+                                if (milliseconds_now() >= desiredTime)
+                                {
+                                    localRod->Server_ToggleReeling(true);
+                                    Logger::Log("Data sent\n");
+                                    desiredTime = milliseconds_now() + 1000;
+                                }
                                 //localRod->Server_ToggleReeling(true);
                             }
 
@@ -1104,7 +1111,14 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             {
 
                                 //Logger::Log("3\n");
-                                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                                //mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                                static std::uintptr_t desiredTime = 0;
+                                if (milliseconds_now() >= desiredTime)
+                                {
+                                    localRod->Server_ToggleReeling(false);
+                                    Logger::Log("Data sent\n");
+                                    desiredTime = milliseconds_now() + 1000;
+                                }
                                 //localRod->Server_ToggleReeling(false);
                                 if (localRod->FishingFloatOffset.Y > -300.f && localRod->FishingFloatOffset.Y < 300.f) // Direction = Up
                                 {
