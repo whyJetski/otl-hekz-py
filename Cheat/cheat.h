@@ -165,6 +165,18 @@ private:
                 float drawdistance = 0.f;
                 ImVec4 textCol = { 1.f, 1.f, 1.f, 1.f };
             } world;
+           
+            struct
+            {
+                bool bEnable = false;
+                bool bName = false;
+                float drawdistance = 0.f;
+                ImVec4 textCol = { 1.f, 1.f, 1.f, 1.f };
+            } storm;
+            
+           
+        
+          
             struct
             {
                 bool bEnable = false;

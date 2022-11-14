@@ -918,6 +918,9 @@ struct USceneComponent {
 struct APuzzleVault {
 	char pad[0x1030]; 
 	ASlidingDoor* OuterDoor; // 0x1030(0x8)
+
+
+
 };
 
 struct FGuid
@@ -1728,6 +1731,11 @@ public:
 		return IsA(obj);
 	}
 
+
+
+
+
+
 	inline bool isNewHole()
 	{
 		static auto obj = UObject::FindClass("BlueprintGeneratedClass BP_BaseInternalDamageZone.BP_BaseInternalDamageZone_C");
@@ -1774,6 +1782,15 @@ public:
 		static auto obj = UObject::FindClass("Class Athena.GameplayEventSignal");
 		return IsA(obj);
 	}
+
+
+	inline bool isStorm() {
+		static auto obj = UObject::FindClass("Class Athena.Storm");
+		return IsA(obj);
+	}
+
+
+
 
 	inline bool isSail() {
 		static auto obj = UObject::FindClass("Class Athena.Sail");
