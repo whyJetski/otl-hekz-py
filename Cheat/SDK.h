@@ -2406,7 +2406,18 @@ struct AFishingRod {
 	void Server_PlayerHasDetectedABlockedFish(); // Function Athena.FishingRod.Server_PlayerHasDetectedABlockedFish // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90e50
 	void Server_EndPreCasting(float Duration); // Function Athena.FishingRod.Server_EndPreCasting // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90da0
 	void Server_BeginPreCasting(); // Function Athena.FishingRod.Server_BeginPreCasting // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90d50
-	void Server_BattlingStateChanged(char InputDirection, char BattlingDirection); // Function Athena.FishingRod.Server_BattlingStateChanged // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90c60
+	//void Server_BattlingStateChanged(char InputDirection, char BattlingDirection); // Function Athena.FishingRod.Server_BattlingStateChanged // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90c60
+	void Server_BattlingStateChanged(char InputDirection, char BattlingDirection)
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Athena.FishingRod.Server_BattlingStateChanged");
+		struct {
+			char InputDirection;
+			char BattlingDirection;
+		} params;
+		params.InputDirection = InputDirection;
+		params.BattlingDirection = BattlingDirection;
+		ProcessEvent(this, fn, &params);
+	}
 	void Server_AddBaitToFloat(struct AItemInfo* SelectedItem); // Function Athena.FishingRod.Server_AddBaitToFloat // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90ba0
 	void OnRep_ServerState(); // Function Athena.FishingRod.OnRep_ServerState // Final|Native|Private // @ game+0x3d90aa0
 	void OnRep_ReplicatedFishState(struct FFishingRodReplicatedFishState PreviousReplicatedFishState); // Function Athena.FishingRod.OnRep_ReplicatedFishState // Final|Native|Private|HasOutParms // @ game+0x3d90a00

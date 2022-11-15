@@ -1100,7 +1100,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 if (milliseconds_now() >= desiredTime)
                                 {
                                     localRod->Server_ToggleReeling(true);
-                                    Logger::Log("Data sent\n");
+                                    //Logger::Log("Data sent\n");
                                     desiredTime = milliseconds_now() + 1000;
                                 }
                                 //localRod->Server_ToggleReeling(true);
@@ -1116,7 +1116,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 if (milliseconds_now() >= desiredTime)
                                 {
                                     localRod->Server_ToggleReeling(false);
-                                    Logger::Log("Data sent\n");
+                                    //Logger::Log("Data sent\n");
                                     desiredTime = milliseconds_now() + 1000;
                                 }
                                 //localRod->Server_ToggleReeling(false);
