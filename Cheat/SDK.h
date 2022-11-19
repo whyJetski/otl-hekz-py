@@ -1686,6 +1686,11 @@ public:
 		return IsA(obj);
 	}
 
+	inline bool isSloop() {
+		static auto obj = UObject::FindClass("Class Athena.SmallShip");
+		return IsA(obj);
+	}
+
 	inline bool isCannonProjectile() {
 		static auto obj = UObject::FindClass("Class Athena.CannonProjectile");
 		return IsA(obj);
@@ -2327,6 +2332,31 @@ struct AFishingFish : ACharacter {
 	void Multicast_SetVisible(); // Function Athena.FishingFish.Multicast_SetVisible // Net|NetReliableNative|Event|NetMulticast|Public // @ game+0x3d908c0
 };
 
+struct FAthenaAnimationFishingParams {
+	char FishingState; // 0x00(0x01)
+	bool InFishing; // 0x01(0x01)
+	char UnknownData_2[0x2]; // 0x02(0x02)
+	struct FVector2D RodBend; // 0x04(0x08)
+	float ReelSpeed; // 0x0c(0x04)
+	bool CastFailed; // 0x10(0x01)
+	bool IsFishHookedAndVisible; // 0x11(0x01)
+	char UnknownData_12[0x2]; // 0x12(0x02)
+	struct FVector2D PlayerInputForce; // 0x14(0x08)
+	float TensionShake; // 0x1c(0x04)
+	float LineSnapShake; // 0x20(0x04)
+	bool IKIsActive; // 0x24(0x01)
+	char UnknownData_25[0x3]; // 0x25(0x03)
+	float IKBlendInSpeed; // 0x28(0x04)
+	float IKBlendIOutSpeed; // 0x2c(0x04)
+	bool IsComedyItem; // 0x30(0x01)
+	char FishingJIPState; // 0x31(0x01)
+	char UnknownData_32[0x2]; // 0x32(0x02)
+};
+
+struct FEventSetFishingTensionShake {
+	float TensionShake; // 0x00(0x04)
+};
+
 struct FFishingRodReplicatedFishState {
 	struct AFishingFish* FishingFish; // 0x00(0x08)
 	char FishingFishState; // 0x08(0x01)
@@ -2404,9 +2434,22 @@ struct AFishingRod {
 	void Server_SetAreFishingAnimationsLoaded(bool InAreAnimsLoaded); // Function Athena.FishingRod.Server_SetAreFishingAnimationsLoaded // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90ef0
 	void Server_PlayerHasDetectedABlockedLine(); // Function Athena.FishingRod.Server_PlayerHasDetectedABlockedLine // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90ea0
 	void Server_PlayerHasDetectedABlockedFish(); // Function Athena.FishingRod.Server_PlayerHasDetectedABlockedFish // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90e50
-	void Server_EndPreCasting(float Duration); // Function Athena.FishingRod.Server_EndPreCasting // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90da0
-	void Server_BeginPreCasting(); // Function Athena.FishingRod.Server_BeginPreCasting // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90d50
-	//void Server_BattlingStateChanged(char InputDirection, char BattlingDirection); // Function Athena.FishingRod.Server_BattlingStateChanged // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90c60
+	//void Server_EndPreCasting(float Duration); // Function Athena.FishingRod.Server_EndPreCasting // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90da0
+	void Server_EndPreCasting(float Duration)
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Athena.FishingRod.Server_EndPreCasting");
+		struct {
+			float Duration;
+		} params;
+		params.Duration = Duration;
+		ProcessEvent(this, fn, &params);
+	}
+	void Server_BeginPreCasting() // Function Athena.FishingRod.Server_BeginPreCasting // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90d50
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Athena.FishingRod.Server_BeginPreCasting");
+		ProcessEvent(this, fn, nullptr);
+	}
+		//void Server_BattlingStateChanged(char InputDirection, char BattlingDirection); // Function Athena.FishingRod.Server_BattlingStateChanged // Final|Net|NetReliableNative|Event|Private|NetServer|NetValidate // @ game+0x3d90c60
 	void Server_BattlingStateChanged(char InputDirection, char BattlingDirection)
 	{
 		static auto fn = UObject::FindObject<UFunction>("Function Athena.FishingRod.Server_BattlingStateChanged");
@@ -2431,10 +2474,14 @@ struct AFishingRod {
 	void OnRep_BaitOnFloat(); // Function Athena.FishingRod.OnRep_BaitOnFloat // Final|Native|Private // @ game+0x3d90900
 	void OnComedyItemDestroyed(); // Function Athena.FishingRod.OnComedyItemDestroyed // Final|Native|Private // @ game+0x3d908e0
 	void Multicast_RetractLine(char FishingRodRetractLineVisuals); // Function Athena.FishingRod.Multicast_RetractLine // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d90840
-	void Multicast_RemoveFishInstant(); // Function Athena.FishingRod.Multicast_RemoveFishInstant // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d90820
-	void Multicast_RemoveFishFromLine(); // Function Athena.FishingRod.Multicast_RemoveFishFromLine // Final|Net|Native|Event|NetMulticast|Private // @ game+0x3d90800
+	void Multicast_RemoveFishInstant();// Function Athena.FishingRod.Multicast_RemoveFishInstant // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d90820
+	void Multicast_RemoveFishFromLine() // Function Athena.FishingRod.Multicast_RemoveFishFromLine // Final|Net|Native|Event|NetMulticast|Private // @ game+0x3d90800
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Athena.FishingRod.Multicast_RemoveFishFromLine");
+		ProcessEvent(this, fn, nullptr);
+	}
 	void Multicast_FishEscaped(); // Function Athena.FishingRod.Multicast_FishEscaped // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d907e0
-	void Multicast_BringInACatch(bool IsComedyItem); // Function Athena.FishingRod.Multicast_BringInACatch // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d90750
+	void Multicast_BringInACatch(bool IsComedyItem);// Function Athena.FishingRod.Multicast_BringInACatch // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x3d90750
 };
 
 enum class EFishingRodServerState : uint8_t {

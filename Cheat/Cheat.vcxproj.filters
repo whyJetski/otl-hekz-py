@@ -44,6 +44,12 @@
     <ClCompile Include="..\include\UE4\UE4.cpp">
       <Filter>Sources\UE4</Filter>
     </ClCompile>
+    <ClCompile Include="imgui_helper.cpp">
+      <Filter>Sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="MH.cpp">
+      <Filter>Sources\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cheat.h">
@@ -51,6 +57,12 @@
     </ClInclude>
     <ClInclude Include="SDK.h">
       <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_helper.h">
+      <Filter>Sources\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="MH.h">
+      <Filter>Sources\imgui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

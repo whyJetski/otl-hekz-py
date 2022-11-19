@@ -1041,7 +1041,7 @@ bool ImGui::ImageButton(ImTextureID user_texture_id, const ImVec2& size, const I
     return ImageButtonEx(id, user_texture_id, size, uv0, uv1, padding, bg_col, tint_col);
 }
 
-bool ImGui::Checkbox(const char* label, bool* v)
+/*bool ImGui::Checkbox(const char* label, bool* v)
 {
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
@@ -1085,6 +1085,89 @@ bool ImGui::Checkbox(const char* label, bool* v)
 
     if (g.LogEnabled)
         LogRenderedText(&total_bb.Min, *v ? "[x]" : "[ ]");
+    if (label_size.x > 0.0f)
+        RenderText(ImVec2(check_bb.Max.x + style.ItemInnerSpacing.x, check_bb.Min.y + style.FramePadding.y), label);
+
+    IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags | ImGuiItemStatusFlags_Checkable | (*v ? ImGuiItemStatusFlags_Checked : 0));
+    return pressed;
+}*/
+
+bool ImGui::Checkbox(const char* label, bool* v)
+{
+    ImGuiWindow* window = GetCurrentWindow();
+    if (window->SkipItems)
+        return false;
+
+    ImGuiContext& g = *GImGui;
+    const ImGuiStyle& style = g.Style;
+    const ImGuiID id = window->GetID(label);
+    const ImVec2 label_size = CalcTextSize(label, NULL, true);
+
+    const float square_sz = GetFrameHeight();
+    ImVec2 pos = window->DC.CursorPos;
+
+    const ImRect total_bb(pos, pos + ImVec2(square_sz + (label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f), label_size.y + style.FramePadding.y * 2.0f));
+    ItemSize(total_bb, style.FramePadding.y);
+    if (!ItemAdd(total_bb, id))
+        return false;
+
+    bool hovered, held;
+    bool pressed = ButtonBehavior(total_bb, id, &hovered, &held);
+    if (pressed)
+    {
+        *v = !(*v);
+        MarkItemEdited(id);
+    }
+
+
+    const ImRect check_bb(pos, pos + ImVec2(square_sz, square_sz));
+    RenderNavHighlight(total_bb, id);
+    //window->DrawList->AddCircleFilled(check_bb.GetCenter(), 10, GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg));
+    //window->DrawList->AddCircle(check_bb.GetCenter(), 11, GetColorU32(ImGuiCol_CheckMark),12,2.f);
+    //RenderFrame(ImVec2(check_bb.Min.x, check_bb.Min.y) , ImVec2(check_bb.Max.x, check_bb.Max.y), GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg), true, 4.f);
+    //window->DrawList->AddRectFilled(check_bb.Min, check_bb.Max, GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg));
+
+    auto col = GetColorU32((held && hovered) ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg);
+    ImGuiStyle& Currstyle = ImGui::GetStyle();
+    // Currstyle.AntiAliasedLines = 0;
+    // Currstyle.AntiAliasedFill = 0;
+    window->DrawList->AddLine(ImVec2(check_bb.GetBL().x + 0.5f, check_bb.GetBL().y + 0.5f), ImVec2(check_bb.GetTL().x + 0.5f, check_bb.GetTL().y + 0.5f), col, 2); //BL -> TL
+    window->DrawList->AddLine(ImVec2(check_bb.GetBL().x + 0.5f, check_bb.GetBL().y + 0.5f), ImVec2(check_bb.GetBR().x + 0.5f, check_bb.GetBR().y + 0.5f), col, 2); //BL -> BR
+    window->DrawList->AddLine(ImVec2(check_bb.GetBR().x + 0.5f, check_bb.GetBR().y + 0.5f), ImVec2(check_bb.GetTR().x + 0.5f, check_bb.GetTR().y + 0.5f), col, 2); //BR -> TR
+    window->DrawList->AddLine(ImVec2(check_bb.GetTR().x + 0.5f, check_bb.GetTR().y + 0.5f), ImVec2(check_bb.GetTL().x + 0.5f, check_bb.GetTL().y + 0.5f), col, 2); //TR -> TL
+
+    //draw mid
+    //Left Half
+    ImVec2 midTop(check_bb.GetCenter().x + 0.5f, check_bb.GetTL().y + 0.5f);
+    ImVec2 midBottom(check_bb.GetCenter().x + 0.5f, check_bb.GetBL().y + 0.5f);
+
+    ImVec2 UpperLeft(check_bb.GetTL().x + 1.5f, check_bb.GetTL().y + 0.5f);
+    ImVec2 UpperRight(midTop.x + 0.5f, check_bb.GetTR().y + 0.5f);
+    ImVec2 BottomLeft(check_bb.GetBL().x + 1.5f, check_bb.GetBL().y + 0.5f);
+    ImVec2 BottomRight(midTop.x + 0.5f, check_bb.GetBR().y + 0.5f);
+
+    ImRect FirstHalf(UpperLeft, BottomRight);
+
+    ImColor red = ImColor(70, 70, 70, 255);
+    window->DrawList->AddRectFilled(check_bb.Min, check_bb.Max, col);
+    window->DrawList->AddLine(midTop, midBottom, col, 2);
+    window->DrawList->AddRectFilled(FirstHalf.Min, FirstHalf.Max, red, 2);
+
+
+
+    ImU32 check_col = GetColorU32(ImGuiCol_CheckMark);
+    if (*v) {
+        //use mid section initialised above as the (B)TL
+        ImVec2 rUpperRight(check_bb.GetTR().x - .5f, check_bb.GetTR().y + .5f);
+        ImVec2 rBottomRight(check_bb.GetBR().x - .5f, check_bb.GetBR().y + .5f);
+        ImRect SecondHalf(midTop, rBottomRight);
+        window->DrawList->AddRectFilled(ImVec2(check_bb.Min.x, check_bb.Min.y + .5f), ImVec2(check_bb.Max.x, check_bb.Max.y + 1.5f), col);
+        ImColor green = ImColor(255, 20, 147, 255);
+        window->DrawList->AddRectFilled(SecondHalf.Min, SecondHalf.Max, green, 2);
+
+    }
+    //window->DrawList->AddCircleFilled(check_bb.GetCenter(), 7, check_col);
+
     if (label_size.x > 0.0f)
         RenderText(ImVec2(check_bb.Max.x + style.ItemInnerSpacing.x, check_bb.Min.y + style.FramePadding.y), label);
 
@@ -1523,6 +1606,7 @@ bool ImGui::BeginCombo(const char* label, const char* preview_value, ImGuiComboF
         window->DrawList->AddRectFilled(ImVec2(value_x2, frame_bb.Min.y), frame_bb.Max, bg_col, style.FrameRounding, (w <= arrow_size) ? ImDrawCornerFlags_All : ImDrawCornerFlags_Right);
         if (value_x2 + arrow_size - style.FramePadding.x <= frame_bb.Max.x)
             RenderArrow(window->DrawList, ImVec2(value_x2 + style.FramePadding.y, frame_bb.Min.y + style.FramePadding.y), text_col, ImGuiDir_Down, 1.0f);
+            //RenderBullet(window->DrawList, ImVec2(value_x2 + style.FramePadding.y, frame_bb.Min.y + style.FramePadding.y), text_col);
     }
     RenderFrameBorder(frame_bb.Min, frame_bb.Max, style.FrameRounding);
     if (preview_value != NULL && !(flags & ImGuiComboFlags_NoPreview))
@@ -2802,7 +2886,7 @@ bool ImGui::SliderBehavior(const ImRect& bb, ImGuiID id, ImGuiDataType data_type
 // Read code of e.g. SliderFloat(), SliderInt() etc. or examples in 'Demo->Widgets->Data Types' to understand how to use this function directly.
 bool ImGui::SliderScalar(const char* label, ImGuiDataType data_type, void* p_data, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags)
 {
-    ImGuiWindow* window = GetCurrentWindow();
+   /* ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
 
@@ -2878,7 +2962,93 @@ bool ImGui::SliderScalar(const char* label, ImGuiDataType data_type, void* p_dat
         RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
 
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags);
-    return value_changed;
+    return value_changed;*/
+        ImGuiWindow* window = GetCurrentWindow();
+        if (window->SkipItems)
+            return false;
+
+        ImGuiContext& g = *GImGui;
+        const ImGuiStyle& style = g.Style;
+        const ImGuiID id = window->GetID(label);
+        const float w = CalcItemWidth();
+
+        const ImVec2 label_size = CalcTextSize(label, NULL, true);
+        const ImRect frame_bb(window->DC.CursorPos, window->DC.CursorPos + ImVec2(w, label_size.y + style.FramePadding.y * 2.0f));
+        const ImRect total_bb(frame_bb.Min, frame_bb.Max + ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f, 0.0f));
+
+        ItemSize(total_bb, style.FramePadding.y);
+        if (!ItemAdd(total_bb, id, &frame_bb))
+            return false;
+
+        // Default format string when passing NULL
+        if (format == NULL)
+            format = DataTypeGetInfo(data_type)->PrintFmt;
+        else if (data_type == ImGuiDataType_S32 && strcmp(format, "%d") != 0) // (FIXME-LEGACY: Patch old "%.0f" format string to use "%d", read function more details.)
+            format = PatchFormatStringFloatToInt(format);
+
+        // Tabbing or CTRL-clicking on Slider turns it into an input box
+        const bool hovered = ItemHoverable(frame_bb, id);
+        bool temp_input_is_active = TempInputIsActive(id);
+        bool temp_input_start = false;
+        if (!temp_input_is_active)
+        {
+            const bool focus_requested = FocusableItemRegister(window, id);
+            const bool clicked = (hovered && g.IO.MouseClicked[0]);
+            if (focus_requested || clicked || g.NavActivateId == id || g.NavInputId == id)
+            {
+                SetActiveID(id, window);
+                SetFocusID(id, window);
+                FocusWindow(window);
+                g.ActiveIdUsingNavDirMask |= (1 << ImGuiDir_Left) | (1 << ImGuiDir_Right);
+                if (focus_requested || (clicked && g.IO.KeyCtrl) || g.NavInputId == id)
+                {
+                    temp_input_start = true;
+                    FocusableItemUnregister(window);
+                }
+            }
+        }
+
+        // Our current specs do NOT clamp when using CTRL+Click manual input, but we should eventually add a flag for that..
+        if (temp_input_is_active || temp_input_start)
+            return TempInputScalar(frame_bb, id, label, data_type, p_data, format);// , p_min, p_max);
+
+        // Draw frame
+        const ImU32 frame_col = GetColorU32(g.ActiveId == id ? ImGuiCol_FrameBgActive : g.HoveredId == id ? ImGuiCol_FrameBgHovered : ImGuiCol_Separator);
+        RenderNavHighlight(frame_bb, id);
+        //RenderFrame(frame_bb.Min, frame_bb.Max, frame_col, true, g.Style.FrameRounding);
+
+        // Slider behavior
+        ImRect grab_bb;
+        const bool value_changed = SliderBehavior(frame_bb, id, data_type, p_data, p_min, p_max, format, ImGuiSliderFlags_None, &grab_bb);
+        if (value_changed)
+            MarkItemEdited(id);
+
+        ImColor bodyColor = ImColor(int(24), int(24), int(24), 255);
+        // Render grab
+        window->DrawList->AddLine(ImVec2(frame_bb.Min.x, frame_bb.GetCenter().y), ImVec2(frame_bb.Max.x - 10, frame_bb.GetCenter().y), frame_col);
+        window->DrawList->AddLine(ImVec2(frame_bb.Min.x, grab_bb.GetCenter().y), ImVec2(grab_bb.Max.x - 10, grab_bb.GetCenter().y), ImGuiCol_Button);
+
+        if (grab_bb.Max.x > grab_bb.Min.x) {
+            window->DrawList->AddCircleFilled(ImVec2((grab_bb.Min.x + grab_bb.Max.x) / 2, grab_bb.GetCenter().y), 8, GetColorU32(g.ActiveId == id ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab));
+            window->DrawList->AddCircleFilled(ImVec2((grab_bb.Min.x + grab_bb.Max.x) / 2, grab_bb.GetCenter().y), 4, GetColorU32(ImGuiCol_FrameBg));
+        }
+        //window->DrawList->AddRectFilled(grab_bb.Min, grab_bb.Max, GetColorU32(g.ActiveId == id ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab), style.GrabRounding);
+
+   // Display value using user-provided display format so user can add prefix/suffix/decorations to the value.
+
+        char value_buf[64];
+        const char* value_buf_end = value_buf + DataTypeFormatString(value_buf, IM_ARRAYSIZE(value_buf), data_type, p_data, format);
+        //RenderTextClipped(frame_bb.Min, ImVec2(frame_bb.Max.x, frame_bb.Max.y + 25), value_buf, value_buf_end, NULL, ImVec2(0.5, 0.5));
+        RenderTextClipped(frame_bb.Min, ImVec2(frame_bb.Max.x + 45, frame_bb.Max.y), value_buf, value_buf_end, NULL, ImVec2(1.0f, 0.5f));
+
+        if (label_size.x > 0.0f)
+            RenderText(ImVec2(frame_bb.Min.x, frame_bb.Min.y + 20), label);
+        ImGui::Spacing();
+        //ImGui::NewLine();
+
+        //IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags);
+        return value_changed;
+
 }
 
 // Add multiple sliders on 1 line for compact edition of multiple components
@@ -4663,7 +4833,7 @@ bool ImGui::ColorEdit4(const char* label, float col[4], ImGuiColorEditFlags flag
     const float inputs_offset_x = (style.ColorButtonPosition == ImGuiDir_Left) ? w_button : 0.0f;
     window->DC.CursorPos.x = pos.x + inputs_offset_x;
 
-    if ((flags & (ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV)) != 0 && (flags & ImGuiColorEditFlags_NoInputs) == 0)
+   /* if ((flags & (ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV)) != 0 && (flags & ImGuiColorEditFlags_NoInputs) == 0)
     {
         // RGB/HSV 0..255 Sliders
         const float w_item_one  = ImMax(1.0f, IM_FLOOR((w_inputs - (style.ItemInnerSpacing.x) * (components - 1)) / (float)components));
@@ -4728,13 +4898,13 @@ bool ImGui::ColorEdit4(const char* label, float col[4], ImGuiColorEditFlags flag
         }
         if (!(flags & ImGuiColorEditFlags_NoOptions))
             OpenPopupOnItemClick("context");
-    }
+    }*/
 
     ImGuiWindow* picker_active_window = NULL;
     if (!(flags & ImGuiColorEditFlags_NoSmallPreview))
     {
-        const float button_offset_x = ((flags & ImGuiColorEditFlags_NoInputs) || (style.ColorButtonPosition == ImGuiDir_Left)) ? 0.0f : w_inputs + style.ItemInnerSpacing.x;
-        window->DC.CursorPos = ImVec2(pos.x + button_offset_x, pos.y);
+        //const float button_offset_x = ((flags & ImGuiColorEditFlags_NoInputs) || (style.ColorButtonPosition == ImGuiDir_Left)) ? 0.0f : w_inputs + style.ItemInnerSpacing.x;
+        //window->DC.CursorPos = ImVec2(pos.x + button_offset_x, pos.y);
 
         const ImVec4 col_v4(col[0], col[1], col[2], alpha ? col[3] : 1.0f);
         if (ColorButton("##ColorButton", col_v4, flags))
@@ -4769,7 +4939,7 @@ bool ImGui::ColorEdit4(const char* label, float col[4], ImGuiColorEditFlags flag
     if (label != label_display_end && !(flags & ImGuiColorEditFlags_NoLabel))
     {
         const float text_offset_x = (flags & ImGuiColorEditFlags_NoInputs) ? w_button : w_full + style.ItemInnerSpacing.x;
-        window->DC.CursorPos = ImVec2(pos.x + text_offset_x, pos.y + style.FramePadding.y);
+        window->DC.CursorPos = ImVec2(pos.x + w_button + style.ItemInnerSpacing.x, pos.y + style.FramePadding.y);
         TextEx(label, label_display_end);
     }
 

@@ -2472,3 +2472,6 @@ struct ImFont
 #endif
 
 #endif // #ifndef IMGUI_DISABLE
+struct ImGuiTextFilter2 : public ImGuiTextFilter {
+    IMGUI_API bool      Draw2(const char* label = "Filter (inc,-exc)", float width = 0.0f);  // filter.Draw | Helper calling InputText+Build
+};

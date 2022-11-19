@@ -239,6 +239,7 @@ private:
                 float fYaw = 1.f;
                 float fPitch = 1.f;
                 float fSmoothness = 1.f;
+                bool randomshots = false;
             } cannon;
         } aim;
         
@@ -343,11 +344,24 @@ private:
         static HCURSOR WINAPI SetCursorHook(HCURSOR hCursor);
 		static void HookInput();
 		static void RemoveInput();
+        static void renderLogo();
+        static void renderPanel();
+        static void renderTabs();
+        static void renderUser();
+        static void renderSubTab0();
+        static void renderSubTab1();
+        static void renderSubTab2();
+        static void renderSubTab3();
 		static HRESULT PresentHook(IDXGISwapChain* swapChain, UINT syncInterval, UINT flags);
 		static HRESULT ResizeHook(IDXGISwapChain* swapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat, UINT swapChainFlags);
 	public:
+        static inline ImFont* font;
+        static inline ImFont* esp_font;
+        static inline ImFont* title_font;
+        static inline ImGuiStyle* style;
 		static inline bool Init();
 		static inline bool Remove();
+        static inline int selectedTab = 0, selectedSubTab0 = 0, selectedSubTab1 = 0, selectedSubTab2 = 0, selectedSubTab3 = 0, elementSize = 120;
 	};
 	class Tools {
 	private:

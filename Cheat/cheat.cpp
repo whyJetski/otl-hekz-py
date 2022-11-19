@@ -16,6 +16,8 @@
 #include <fmt-8.0.1/include/fmt/format.h>
 #include <fmt-8.0.1/include/fmt/format-inl.h>
 #include <fmt-8.0.1/src/format.cc>
+#include "imgui_helper.h"
+
 
 uintptr_t milliseconds_now() {
     static LARGE_INTEGER s_frequency;
@@ -60,6 +62,17 @@ float MinArr(float arr[], int n)
     return min;
 }
 
+int randomnumber = 0; // Number Holder
+
+void fn()
+{
+    int min = -1000; // Back of the Target
+    int max = +2000; // Front of the Target
+    int randomNum = rand() % max + (min); // Random Number Gen
+    randomnumber = randomNum; // Changes the value of randomnumber to the value of randomNum
+    return; // disables the function because you should call it inside of a loop
+}
+
 #define STEAM
 //#define LOGFILE
 //#define UWPDEBUG
@@ -69,13 +82,12 @@ namespace fs = std::filesystem;
 
 void Cheat::Hacks::OnWeaponFiredHook(UINT64 arg1, UINT64 arg2)
 {
-    /*Logger::Log("arg1: %p, arg2: %p\n", arg1, arg2);
+    Logger::Log("arg1: %p, arg2: %p\n", arg1, arg2);
     auto& cameraCache = cache.localCamera->CameraCache.POV;
     auto prev = cameraCache.Rotation;
     cameraCache.Rotation = { -cameraCache.Rotation.Pitch, -cameraCache.Rotation.Yaw, 0.f };
-    float ProjectileDistributionMaxAngle;*/
-
     return OnWeaponFiredOriginal(arg1, arg2);
+
 }
 
 int32_t targetFunctionIndex = -1;
@@ -175,7 +187,29 @@ void Cheat::Renderer::Drawing::RenderText(const char* text, const FVector2D& pos
     }
     //*/
     window->DrawList->AddText(nullptr, 0.f, ImScreen, ImGui::GetColorU32(color), text);
+}
 
+void Cheat::Renderer::renderPanel() {
+    /*ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(40, 40, 40, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(255, 20, 147, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(70, 70, 70, 255));*/
+    // ImGui::PushStyleColor(ImGuiCol_TabActive, ImVec4(255, 20, 147, 255));
+    Cheat::Renderer::renderLogo();
+    ImGui::Spacing();
+    Cheat::Renderer::renderTabs();
+    // ImGui::PopStyleColor();
+    Cheat::Renderer::renderUser();
+    //ImGui::PopStyleColor();
+    //ImGui::PopStyleVar(6);
+    //ImGui::PopStyleColor();
 }
 
 void Cheat::Renderer::Drawing::Render2DBox(const FVector2D& top, const FVector2D& bottom, const float height, const float width, const ImVec4& color)
@@ -311,12 +345,14 @@ void Cheat::Renderer::RemoveInput()
 }
 
 
+
+
 bool raytrace(UWorld* world, const struct FVector& start, const struct FVector& end, struct FHitResult* hit)
 {
     if (world == nullptr || world->PersistentLevel == nullptr) //some checks
         return false;
 
-    return UKismetMathLibrary::LineTraceSingle_NEW((UObject*)world, start, end, ETraceTypeQuery::TraceTypeQuery1, true, TArray<AActor*>() /*actors to ignore*/, EDrawDebugTrace::EDrawDebugTrace__None, true, hit); //TraceTypeQuery4 equals the visibility channel
+    return UKismetMathLibrary::LineTraceSingle_NEW((UObject*)world, start, end, ETraceTypeQuery::TraceTypeQuery4, true, TArray<AActor*>() /*actors to ignore*/, EDrawDebugTrace::EDrawDebugTrace__None, true, hit); //TraceTypeQuery4 equals the visibility channel
 }
 
 /*bool GetProjectilePath(std::vector<FVector>& v, FVector& Vel, FVector& Pos, float Gravity, int count, UWorld* world)
@@ -528,12 +564,32 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
         ImGui::CreateContext();
 
         {
-            ImGuiIO& io = ImGui::GetIO();
-            static const ImWchar icons_ranges[] = { 0xf000, 0xf578, 0 };
-            ImFont* font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 17);
+            ImGuiIO& io = ImGui::GetIO(); (void)io;
+            io.Fonts->Clear();
+            static const ImWchar icons_ranges[] = { 0xe000, 0xf8ff, 0 };
+            //ImFont* font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\calibril.ttf", 17);
+
+            ImFontConfig font_cfg;
+            font_cfg.FontDataOwnedByAtlas = false;
+            font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\calibril.ttf", 16, &font_cfg);
+
             ImFontConfig config;
             config.MergeMode = true;
+            config.PixelSnapH = true;
+            config.FontDataOwnedByAtlas = false;
+            //ImFont* font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\calibril.ttf", 17, &config);
             io.Fonts->AddFontFromMemoryCompressedTTF(font_awesome_data, font_awesome_size, 19.0f, &config, icons_ranges);
+
+            ImFontConfig esp_config;
+            esp_config.FontDataOwnedByAtlas = false;
+            esp_font = io.Fonts->AddFontFromMemoryCompressedTTF((void*)Smallest_compressed_data, Smallest_compressed_size, 14, &esp_config);
+            //esp_font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\smallest_pixel-7.ttf", 16, &esp_config);
+            io.Fonts->AddFontFromMemoryCompressedTTF(font_awesome_data, font_awesome_size, 19.0f, &config, icons_ranges);
+
+            ImFontConfig title_config;
+            title_config.FontDataOwnedByAtlas = false;
+            title_font = io.Fonts->AddFontFromMemoryCompressedTTF((void*)Againts_compressed_data, Againts_compressed_size, 32, &esp_config);
+
             io.Fonts->Build();
         }
 #ifdef STEAM
@@ -555,6 +611,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
         HookInput();
     }
 
+
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
@@ -563,6 +620,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
+    ImGui::PushFont(esp_font);
 
     ImGui::Begin("#1", nullptr, ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
     auto& io = ImGui::GetIO();
@@ -570,7 +628,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
     ImGui::SetWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_Always);
 
     auto drawList = ImGui::GetCurrentWindow()->DrawList;
-
+   
     try
     {
         do
@@ -867,6 +925,104 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
 
             }
 
+            if (cfg.fishing.bEnable)
+            {
+                if (item)
+                {
+                    if (item->isFishingRod())
+                    {
+                        auto const localRod = *reinterpret_cast<AFishingRod**>(&item);
+                        auto serverstate = localRod->ServerState;
+                        //auto tensionshake = localRod->FishingTensionShake.TensionShake;
+                        INPUT input{ 0 };
+                        input.type = INPUT_MOUSE;
+
+                        if (serverstate == 0)
+                        {
+                            /*static std::uintptr_t desiredTime = 0;
+                            if (milliseconds_now() >= desiredTime)
+                            {
+                                input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+                                SendInput(1, &input, sizeof(INPUT));
+                                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                                input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+                                SendInput(1, &input, sizeof(INPUT));
+                                Logger::Log("Data sent\n");
+                                desiredTime = milliseconds_now() + 2500;
+                            }*/
+                        }
+
+                        if (localRod->ReplicatedFishState.FishingFishState == 4)
+                        {
+                            //Logger::Log("4\n");
+                            //mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                            static std::uintptr_t desiredTime = 0;
+                            if (milliseconds_now() >= desiredTime)
+                            {
+                                localRod->Server_ToggleReeling(true);
+                                //Logger::Log("Data sent\n");
+                                desiredTime = milliseconds_now() + 1000;
+                            }
+                            //localRod->Server_ToggleReeling(true);
+                        }
+
+
+                        else if (localRod->ReplicatedFishState.FishingFishState == 3)
+                        {
+                            //Logger::Log("Tension shake %.0f", tensionshake);
+                            //Logger::Log("3\n");
+                            //mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                            static std::uintptr_t desiredTime = 0;
+                            if (milliseconds_now() >= desiredTime)
+                            {
+                                localRod->Server_ToggleReeling(false);
+                                //Logger::Log("Data sent\n");
+                                //Logger::Log("Tension shake %.0f\n", tensionshake);
+                                desiredTime = milliseconds_now() + 1000;
+                            }
+                            //localRod->Server_ToggleReeling(false);
+                            if (localRod->FishingFloatOffset.Y > -300.f && localRod->FishingFloatOffset.Y < 300.f) // Direction = Up
+                            {
+                                //Logger::Log("Up\n");
+                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                            }
+                            else if (localRod->FishingFloatOffset.Y < -300.f) // Direction = Left
+                            {
+                                //Logger::Log("Left\n");
+                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                            }
+                            else if (localRod->FishingFloatOffset.Y > 300.f) // Direction = Right
+                            {
+                                //Logger::Log("Right\n");
+                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
+                            }
+                        }
+
+                        else if (serverstate == 12 && !localRod->PlayerIsBattlingFish)
+                        {
+                            //Logger::Log("5\n");
+                            input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+                            SendInput(1, &input, sizeof(INPUT));
+                            keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                            keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                            keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                            /*std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+                            //void Multicast_RemoveFishFromLine();
+                            keybd_event(0x46, 42, KEYEVENTF_EXTENDEDKEY, 0);
+                            keybd_event(0x46, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+                            cfg.fishing.bEnable = false;*/
+                            // Press all the keys up, disable the feature
+                        }
+                    }
+                }
+            }
+
             if (cfg.misc.bEnable && !localCharacter->IsLoading())
             {
                 if (cfg.misc.client.bEnable)
@@ -1075,86 +1231,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                         
                     }
                 }
-                if (cfg.fishing.bEnable)
-                {
-                    if (item)
-                    {
-                        if (item->isFishingRod())
-                        {
-                            auto const localRod = *reinterpret_cast<AFishingRod**>(&item);
-                            auto serverstate = localRod->ServerState;
-
-
-                            /* if (serverstate == 0)
-                             {
-                                 mouse_event(0x0002, 0, 0, 0, 0);
-                                 Sleep(500);
-                                 mouse_event(0x0004, 0, 0, 0, 0);
-                             }*/
-
-                            if (localRod->ReplicatedFishState.FishingFishState == 4)
-                            {
-                                //Logger::Log("4\n");
-                                //mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                                static std::uintptr_t desiredTime = 0;
-                                if (milliseconds_now() >= desiredTime)
-                                {
-                                    localRod->Server_ToggleReeling(true);
-                                    //Logger::Log("Data sent\n");
-                                    desiredTime = milliseconds_now() + 1000;
-                                }
-                                //localRod->Server_ToggleReeling(true);
-                            }
-
-
-                            else if (localRod->ReplicatedFishState.FishingFishState == 3)
-                            {
-
-                                //Logger::Log("3\n");
-                                //mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-                                static std::uintptr_t desiredTime = 0;
-                                if (milliseconds_now() >= desiredTime)
-                                {
-                                    localRod->Server_ToggleReeling(false);
-                                    //Logger::Log("Data sent\n");
-                                    desiredTime = milliseconds_now() + 1000;
-                                }
-                                //localRod->Server_ToggleReeling(false);
-                                if (localRod->FishingFloatOffset.Y > -300.f && localRod->FishingFloatOffset.Y < 300.f) // Direction = Up
-                                {
-                                    //Logger::Log("Up\n");
-                                    keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                    keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                    keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
-                                }
-                                else if (localRod->FishingFloatOffset.Y < -300.f) // Direction = Left
-                                {
-                                    //Logger::Log("Left\n");
-                                    keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                    keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                    keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
-                                }
-                                else if (localRod->FishingFloatOffset.Y > 300.f) // Direction = Right
-                                {
-                                    //Logger::Log("Right\n");
-                                    keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                    keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                    keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | 0, 0);
-                                }
-                            }
-
-                            else if (localRod->ReplicatedFishState.FishingFishState == 5 && !localRod->PlayerIsBattlingFish)
-                            {
-                                //Logger::Log("5\n");
-                                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-                                keybd_event(0x53, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                keybd_event(0x44, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                keybd_event(0x41, 42, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-                                // Press all the keys up, disable the feature
-                            }
-                        }
-                    }
-                }
+                
             }
 
             for (auto l = 0u; l < levels.Count; l++)
@@ -1262,7 +1339,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                     auto type = actor->GetName();
                                     char buf[0x64];
                                     if (type.find("BP_Small") != std::string::npos)
-                                        sprintf(buf, "Sloop (%d%% Water) [%dm] [%.0fm/s]", amount, dist, speed);
+                                        sprintf(buf, "Sloop\n(%d%% Water)\n[%dm] [%.0fm/s]", amount, dist, speed);
                                     else if (type.find("BP_Medium") != std::string::npos)
                                         sprintf(buf, "Brig (%d%% Water) [%dm] [%.0fm/s]", amount, dist, speed);
                                     else if (type.find("BP_Large") != std::string::npos)
@@ -2372,6 +2449,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 } while (false);
                             }
 
+
                             if (cfg.aim.cannon.b_chain_shots == false && actor->isShip())
                             {
                                 do
@@ -2417,6 +2495,26 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                         location = loc_mast;
 
                                         gravity_scale = 1.30f;
+                                    }
+
+                                    if (cfg.aim.cannon.randomshots)
+                                    {
+                                            static std::uintptr_t desiredTime = 0; // Delaying it like this because I'm running the whole cheat inside of a loop (using sleep will cause everything to pause)
+                                            if (milliseconds_now() >= desiredTime)
+                                            {
+                                                fn();
+                                                desiredTime = milliseconds_now() + 2000; // Delay
+                                            }
+
+                                            const FVector forward = actor->GetActorForwardVector(); // Target Forward Vector
+                                            const FVector target = actor->K2_GetActorLocation(); // Target Location
+
+                                            FVector loc_target = target;
+
+                                            loc_target += forward * randomnumber;
+
+                                            location = loc_target;
+
                                     }
 
                                     FRotator low, high;
@@ -2585,6 +2683,9 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     drawList->AddLine({ io.DisplaySize.x * 0.5f , io.DisplaySize.y * 0.5f }, { screen.X, screen.Y }, col);
                     drawList->AddCircle({ screen.X, screen.Y }, 3.f, col);
                 }
+                if (localController->ProjectWorldLocationToScreen(aimBest.location, screen))
+                {
+                }
 
                 if (ImGui::IsMouseDown(1))
                 {
@@ -2662,6 +2763,8 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
     ImGui::End();
     ImGui::PopStyleColor();
     ImGui::PopStyleVar(2);
+    ImGui::PopFont();
+
 
     
     
@@ -2675,42 +2778,48 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
 
     if (bIsOpen) {
         ImGui::SetNextWindowSize(ImVec2(1375, 825), ImGuiCond_Once);
-        ImGui::Begin("Pirates of the Caribbean hook", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+        ImGui::PushFont(title_font);
+        ImGui::Begin("Placeholder", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+        ImGui::PopFont();
+
 
         ImGuiStyle* style = &ImGui::GetStyle();
 
         style->WindowPadding = ImVec2(8, 8);
-        style->WindowRounding = 7.0f;
+        style->WindowRounding = 0.0f;
         style->FramePadding = ImVec2(4, 3);
-        style->FrameRounding = 0.0f;
+        style->FrameRounding = 2.0f;
         style->ItemSpacing = ImVec2(6, 4);
         style->ItemInnerSpacing = ImVec2(4, 4);
         style->IndentSpacing = 20.0f;
         style->ScrollbarSize = 14.0f;
-        style->ScrollbarRounding = 9.0f;
+        style->ScrollbarRounding = 0.0f;
         style->GrabMinSize = 5.0f;
         style->GrabRounding = 0.0f;
-        style->WindowBorderSize = 0;
-        style->WindowTitleAlign = ImVec2(0.0f, 0.5f);
+        style->WindowBorderSize = 1;
+        style->WindowTitleAlign = ImVec2(0.5f, 0.5f);
         style->FramePadding = ImVec2(4, 3);
+        style->TabRounding = 0.0f;
 
-        style->Colors[ImGuiCol_TitleBg] = ImColor(1, 32, 255, 225);
-        style->Colors[ImGuiCol_TitleBgActive] = ImColor(1, 32, 255, 225);
+        style->Colors[ImGuiCol_TitleBg] = ImColor(50, 50, 50, 255);
+        style->Colors[ImGuiCol_TitleBgActive] = ImColor(50, 50, 50, 255);
+        //style->Colors[ImGuiCol_Text] = ImColor(255, 20, 147, 255);
 
-        style->Colors[ImGuiCol_Button] = ImColor(1, 32, 255, 225);
-        style->Colors[ImGuiCol_ButtonActive] = ImColor(1, 32, 255, 225);
+        style->Colors[ImGuiCol_Button] = ImColor(255, 20, 147, 225);
+        style->Colors[ImGuiCol_ButtonActive] = ImColor(255, 20, 147, 225);
         style->Colors[ImGuiCol_ButtonHovered] = ImColor(41, 40, 41, 255);
 
         style->Colors[ImGuiCol_Separator] = ImColor(70, 70, 70, 255);
         style->Colors[ImGuiCol_SeparatorActive] = ImColor(76, 76, 76, 255);
         style->Colors[ImGuiCol_SeparatorHovered] = ImColor(76, 76, 76, 255);
 
-        style->Colors[ImGuiCol_Tab] = ImColor(1, 32, 230, 225);
-        style->Colors[ImGuiCol_TabHovered] = ImColor(1, 32, 238, 225);
-        style->Colors[ImGuiCol_TabActive] = ImColor(1, 32, 238, 225);
+        style->Colors[ImGuiCol_Tab] = ImColor(40, 40, 40, 255);
+        style->Colors[ImGuiCol_TabHovered] = ImColor(255, 20, 147, 225);
+        style->Colors[ImGuiCol_TabActive] = ImColor(70, 70, 70, 255);
 
-        style->Colors[ImGuiCol_SliderGrab] = ImColor(1, 32, 255, 225);
-        style->Colors[ImGuiCol_SliderGrabActive] = ImColor(1, 32, 255, 225);
+        style->Colors[ImGuiCol_SliderGrab] = ImColor(255, 20, 147, 225);
+        style->Colors[ImGuiCol_SliderGrabActive] = ImColor(255, 50, 147, 225);
+
 
         style->Colors[ImGuiCol_MenuBarBg] = ImColor(76, 76, 76, 255);
 
@@ -2722,14 +2831,293 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
         style->Colors[ImGuiCol_HeaderActive] = ImColor(0, 0, 0, 0);
         style->Colors[ImGuiCol_HeaderHovered] = ImColor(46, 46, 46, 255);
 
-        if (ImGui::BeginTabBar("Bars")) {
+        style->Colors[ImGuiCol_CheckMark] = ImColor(255, 20, 147, 225);
+
+        style->Colors[ImGuiCol_WindowBg] = ImColor(40, 40, 40, 255);
+        ImGui::PushFont(font);
+        //ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(255, 255, 255, 255));
+
+
+        ImGui::Columns(2);
+        ImGui::SetColumnOffset(1, 173);
+
+        renderPanel();
+
+        {// Right side
+            ImGui::NextColumn();
+            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
+            switch (selectedTab) {
+            case 0: {
+                renderSubTab0();
+                break;
+            }
+            case 1: {
+                renderSubTab1();
+                break;
+            }
+            case 2: {
+                renderSubTab2();
+                break;
+            }
+            case 3: {
+                renderSubTab3();
+                //Config::i().renderImGui();// for config, save current(new), load, delete, duplicate, overwrite
+                break;
+            }
+            }
+            ImGui::PopStyleVar();
+        }
+        /*if (ImGui::BeginTabBar("Bars")) {
             if (ImGui::BeginTabItem(ICON_FA_EYE " Visuals")) 
             {
                 ImGui::Text("Global Visuals");
-                if (ImGui::BeginChild("Global", ImVec2(170.f, 50.f), false, 0))
+                if (ImGui::BeginChild("Global", ImVec2(0.f, 0.f), false, 0))
                 {
                     ImGui::Checkbox("Enable", &cfg.visuals.bEnable);
                     ImGui::Checkbox("Text Outlines", &cfg.visuals.textoutlines);
+                    ImGui::Columns(3, "CLM1", false);
+                    const char* boxes[] = { "None", "2DBox", "3DBox" };
+
+                        ImGui::Text("Players");
+                        if (ImGui::BeginChild("PlayersSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            const char* bars[] = { "None", "2DRectLeft", "2DRectRight", "2DRectBottom", "2DRectTop" };
+                            ImGui::Checkbox("Enable", &cfg.visuals.players.bEnable);
+                            ImGui::Checkbox("Draw Teammates", &cfg.visuals.players.bDrawTeam);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.players.bName);
+                            //ImGui::Checkbox("Draw Weapon Name WIP ", &cfg.visuals.players.bWeaponanmes);
+                            ImGui::Checkbox("Draw Skeleton WIP ", &cfg.visuals.players.bSkeleton);
+                            ImGui::Combo("Box Type", reinterpret_cast<int*>(&cfg.visuals.players.boxType), boxes, IM_ARRAYSIZE(boxes));
+                            ImGui::Combo("Health Bar Type", reinterpret_cast<int*>(&cfg.visuals.players.barType), bars, IM_ARRAYSIZE(bars));
+                            ImGui::ColorEdit4("Visible Enemy Color", &cfg.visuals.players.enemyColorVis.x, 0);
+                            ImGui::ColorEdit4("Invisible Enemy Color", &cfg.visuals.players.enemyColorInv.x, 0);
+                            ImGui::ColorEdit4("Visible Team Color", &cfg.visuals.players.teamColorVis.x, 0);
+                            ImGui::ColorEdit4("Invisible Team Color", &cfg.visuals.players.teamColorInv.x, 0);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.players.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.players.drawdistance, 0.f, 5000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Skeletons");
+                        if (ImGui::BeginChild("SkeletonsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.skeletons.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.skeletons.bName);
+                            ImGui::Combo("Box Type", reinterpret_cast<int*>(&cfg.visuals.skeletons.boxType), boxes, IM_ARRAYSIZE(boxes));
+                            ImGui::ColorEdit4("Visible Color", &cfg.visuals.skeletons.colorVis.x, 0);
+                            ImGui::ColorEdit4("Invisible Color", &cfg.visuals.skeletons.colorInv.x, 0);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.skeletons.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.skeletons.drawdistance, 0.f, 5000.f, "%.0f");
+
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Ships");
+                        if (ImGui::BeginChild("ShipsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse)) {
+
+                            ImGui::Checkbox("Enable", &cfg.visuals.ships.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.ships.bName);
+                            ImGui::Checkbox("Show Holes", &cfg.visuals.ships.bDamage);
+                            ImGui::ColorEdit4("Damage Color", &cfg.visuals.ships.damageColor.x, 0);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.ships.textCol.x, 0);
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Islands");
+                        if (ImGui::BeginChild("IslandsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.islands.bEnable);
+                            ImGui::Checkbox("Draw Names", &cfg.visuals.islands.bName);
+                            ImGui::SliderInt("Max Distance", &cfg.visuals.islands.intMaxDist, 100, 2750, "%d", ImGuiSliderFlags_AlwaysClamp);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.islands.textCol.x, 0);
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Items");
+                        if (ImGui::BeginChild("ItemsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.items.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.items.bName);
+                            ImGui::Checkbox("Barrels", &cfg.visuals.items.barrelitems);
+                            ImGui::Checkbox("Ammo Chests", &cfg.visuals.items.ammochests);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.items.textCol.x, 0);
+                            ImGui::ColorEdit4("Barrel Text Color", &cfg.visuals.items.barreltextCol.x, 0);
+                            ImGui::ColorEdit4("Ammo Chest Text Color", &cfg.visuals.items.ammotextCol.x, 0);
+                            ImGui::SliderFloat("Item Draw Distance", &cfg.visuals.items.itemdrawdistance, 0.f, 5000.f, "%.0f");
+                            ImGui::SliderFloat("Barrel Draw Distance", &cfg.visuals.items.barreldrawdistance, 0.f, 5000.f, "%.0f");
+                            ImGui::SliderFloat("Ammochest Draw Distance", &cfg.visuals.items.ammochestsdrawdistance, 0.f, 5000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Animals");
+                        if (ImGui::BeginChild("AnimalsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.animals.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.animals.bName);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.animals.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.animals.drawdistance, 0.f, 5000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Megalodon");
+                        if (ImGui::BeginChild("MegalodonSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.megalodon.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.megalodon.bName);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.megalodon.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.megalodon.drawdistance, 0.f, 5000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Sharks");
+                        if (ImGui::BeginChild("SharksSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.sharks.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.sharks.bName);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.sharks.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.sharks.drawdistance, 0.f, 5000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Mermaids");
+                        if (ImGui::BeginChild("MermaidsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.mermaids.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.mermaids.bName);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.mermaids.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.mermaids.drawdistance, 0.f, 5000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Rowboats");
+                        if (ImGui::BeginChild("RowboatsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.rowboats.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.rowboats.bName);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.rowboats.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.rowboats.drawdistance, 0.f, 5000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Puzzles");
+                        if (ImGui::BeginChild("PuzzlesSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+
+                            ImGui::Checkbox("Enable", &cfg.visuals.puzzles.bEnable);
+                            ImGui::Checkbox("Draw Doors", &cfg.visuals.puzzles.bDoor);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.puzzles.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.puzzles.drawdistance, 0.f, 5000.f, "%.0f");
+
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Shipwrecks");
+                        if (ImGui::BeginChild("ShipwrecksSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.shipwrecks.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.shipwrecks.bName);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.shipwrecks.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.shipwrecks.drawdistance, 0.f, 5000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Client");
+                        if (ImGui::BeginChild("ClientSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.client.bEnable);
+                            ImGui::Checkbox("Crosshair", &cfg.visuals.client.bCrosshair);
+                            if (cfg.visuals.client.bCrosshair)
+                            {
+                                ImGui::SameLine();
+                                ImGui::SetNextItemWidth(75.f);
+                                ImGui::SliderFloat("Radius##1", &cfg.visuals.client.fCrosshair, 1.f, 100.f);
+                            }
+                            ImGui::ColorEdit4("Crosshair Color", &cfg.visuals.client.crosshairColor.x, ImGuiColorEditFlags_DisplayRGB);
+
+                            ImGui::Checkbox("Oxygen Level", &cfg.visuals.client.bOxygen);
+                            ImGui::Checkbox("Compass", &cfg.visuals.client.bCompass);
+
+                            ImGui::Checkbox("Debug", &cfg.visuals.client.bDebug);
+                            if (cfg.visuals.client.bDebug)
+                            {
+                                ImGui::SameLine();
+                                ImGui::SetNextItemWidth(150.f);
+                                ImGui::SliderFloat("Radius##2", &cfg.visuals.client.fDebug, 1.f, 1000.f);
+                            }
+
+                            ImGui::Checkbox("Cannon Tracers", &cfg.visuals.client.b_cannon_tracers);
+                            ImGui::SliderInt("Tracer Length", &cfg.visuals.client.cannon_tracers_length, 1, 400, "%d");
+                            ImGui::ColorEdit4("Tracer Color", &cfg.visuals.client.cannon_tracers_color.x, ImGuiColorEditFlags_DisplayRGB);
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+
+                        ImGui::Text("Ship Radar");
+                        if (ImGui::BeginChild("RadarSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.radar.bEnable);
+                            ImGui::SliderInt("Radar Size", &cfg.visuals.radar.i_size, 100, 250);
+                            ImGui::SliderInt("Radar Scale", &cfg.visuals.radar.i_scale, 10, 500);
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+                        ImGui::Text("World Events");
+                        if (ImGui::BeginChild("WorldSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.world.bEnable);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.world.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.world.drawdistance, 0.f, 20000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+                        ImGui::NextColumn();
+                        ImGui::Text("Seagulls");
+                        if (ImGui::BeginChild("SeagullsSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.seagulls.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.seagulls.bName);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.seagulls.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.seagulls.drawdistance, 0.f, 20000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
+
+
+                        ImGui::NextColumn();
+                        ImGui::Text("Storm");
+                        if (ImGui::BeginChild("StormSettings", ImVec2(0.f, 200.f), true, 0 | ImGuiWindowFlags_NoScrollWithMouse))
+                        {
+                            ImGui::Checkbox("Enable", &cfg.visuals.storm.bEnable);
+                            ImGui::Checkbox("Draw Name", &cfg.visuals.storm.bName);
+                            ImGui::ColorEdit4("Text Color", &cfg.visuals.storm.textCol.x, 0);
+                            ImGui::SliderFloat("Draw Distance", &cfg.visuals.storm.drawdistance, 0.f, 15000.f, "%.0f");
+                        }
+                        ImGui::EndChild();
                 }
                 ImGui::EndChild();
 
@@ -3058,6 +3446,8 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     ImGui::Checkbox("Insta", &cfg.aim.cannon.b_instant_shoot);
                     ImGui::Checkbox("Aim At Players", &cfg.aim.cannon.playeraimbot);
                     ImGui::Checkbox("Aim At Skeletons", &cfg.aim.cannon.skeletonaimbot);
+                    ImGui::Checkbox("Random Holes", &cfg.aim.cannon.randomshots);
+                    ImGui::Checkbox("Deckshots", &cfg.aim.cannon.deckshots);
                     ImGui::SliderFloat("Yaw", &cfg.aim.cannon.fYaw, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
                     ImGui::SliderFloat("Pitch", &cfg.aim.cannon.fPitch, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
                 }
@@ -3195,11 +3585,10 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
 
                     ImGui::EndTabItem();
             }
-            ImGui::EndTabBar();
-        };
+            ImGui::EndTabBar();*/
+        //};
         ImGui::End();
     }
-  
     context->OMSetRenderTargets(1, &renderTargetView, nullptr);
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -3282,6 +3671,534 @@ inline bool Cheat::Renderer::Init()
     };
 
     return true;
+}
+
+void Cheat::Renderer::renderSubTab0() {
+    std::vector<std::string> arr = { "Regular Aimbot", "Cannon Aimbot", "Other" };
+    //ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
+    ImGuiHelper::drawTabHorizontally("subtab-0", ImVec2(ImGuiHelper::getWidth(), 50), arr, selectedSubTab0);
+    //ImGui::PopStyleVar();
+    ImGui::Spacing();
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
+    ImGui::BeginChild("modules-wrapper", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), false);
+    ImGui::PopStyleColor();
+
+    switch (selectedSubTab0) {
+    case 0: {
+        ImGui::Columns(2, nullptr, false);
+        ImGui::SetColumnOffset(1, 500);
+
+        ImGui::Checkbox("Global Aim Switch", &cfg.aim.bEnable);
+
+        ImGui::Text("Players");
+        ImGui::BeginChild("Player Settings", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        //ImGui::Checkbox("Enable", &cfg.aim.bEnable);
+        ImGui::Checkbox("Enable", &cfg.aim.players.bEnable);
+        ImGui::Checkbox("Visible Only", &cfg.aim.players.bVisibleOnly);
+        ImGui::Checkbox("Aim At Teammates", &cfg.aim.players.bTeam);
+        ImGui::SliderFloat("Yaw", &cfg.aim.players.fYaw, 1.f, 200.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Pitch", &cfg.aim.players.fPitch, 1.f, 200.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Smoothness", &cfg.aim.players.fSmoothness, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Aim Height", &cfg.aim.players.fAimHeight, 0.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+
+        ImGui::EndChild();
+        ImGui::NextColumn();
+        //ImGui::SetColumnOffset(1, 300);
+        //ImGui::Spacing();
+        ImGui::Text("Skeletons");
+        ImGui::BeginChild("Skeleton Settings", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.aim.skeletons.bEnable);
+        ImGui::Checkbox("Visible Only", &cfg.aim.skeletons.bVisibleOnly);
+        ImGui::SliderFloat("Yaw", &cfg.aim.skeletons.fYaw, 1.f, 200.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Pitch", &cfg.aim.skeletons.fPitch, 1.f, 200.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Smoothness", &cfg.aim.skeletons.fSmoothness, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Aim Height", &cfg.aim.skeletons.fAimHeight, 0.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        //RCS::i().renderImGui();
+        ImGui::EndChild();
+
+        
+
+        //ImGui::BeginChild("aimassist3", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        //ImGui::EndChild();
+
+        break;
+    }
+    case 1: {
+        //ImGui::Columns(2, nullptr, false);
+        ImGui::Text("Cannon");
+        ImGui::BeginChild("Cannon settings", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.aim.cannon.bEnable);
+        ImGui::Checkbox("Chain Aimbot (Auto Detects)", &cfg.aim.cannon.b_chain_shots);
+        ImGui::Checkbox("Visible Only", &cfg.aim.cannon.bVisibleOnly);
+        ImGui::Checkbox("Insta", &cfg.aim.cannon.b_instant_shoot);
+        ImGui::Checkbox("Aim At Players", &cfg.aim.cannon.playeraimbot);
+        ImGui::Checkbox("Aim At Skeletons", &cfg.aim.cannon.skeletonaimbot);
+        ImGui::Checkbox("Random Holes", &cfg.aim.cannon.randomshots);
+        ImGui::Checkbox("Deckshots", &cfg.aim.cannon.deckshots);
+        ImGui::SliderFloat("Yaw", &cfg.aim.cannon.fYaw, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Pitch", &cfg.aim.cannon.fPitch, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::EndChild();
+        break;
+    }
+    case 2: {
+        ImGui::Text("Harpoon");
+        ImGui::BeginChild("Harpoon settings", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.aim.harpoon.bEnable);
+        ImGui::Checkbox("Visible Only", &cfg.aim.harpoon.bVisibleOnly);
+        ImGui::SliderFloat("Yaw", &cfg.aim.harpoon.fYaw, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Pitch", &cfg.aim.harpoon.fPitch, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::EndChild();
+        break;
+    }
+    }
+
+    ImGui::EndChild();
+}
+
+void Cheat::Renderer::renderSubTab1() {
+    ImGuiHelper::drawTabHorizontally("subtab-1", ImVec2(ImGuiHelper::getWidth(), 50), { "ESP", "World", "Other" }, selectedSubTab1);
+    ImGui::Spacing();
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
+    ImGui::BeginChild("modules-wrapper", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), false);
+    ImGui::PopStyleColor();
+
+    switch (selectedSubTab1) {
+    case 0: {
+        ImGui::Columns(2, nullptr, false);
+        ImGui::SetColumnOffset(1, 500);
+
+        ImGui::Checkbox("Global Visuals Switch", &cfg.visuals.bEnable);
+
+        const char* bars[] = { "None", "2DRectLeft", "2DRectRight", "2DRectBottom", "2DRectTop" };
+        const char* boxes[] = { "None", "2DBox", "3DBox" };
+        
+        //
+
+        ImGui::Text("Players");
+        ImGui::BeginChild("Player ESP", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.players.bEnable);
+        ImGui::Checkbox("Draw Teammates", &cfg.visuals.players.bDrawTeam);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.players.bName);
+        //ImGui::Checkbox("Draw Weapon Name WIP ", &cfg.visuals.players.bWeaponanmes);
+        ImGui::Checkbox("Draw Skeleton WIP ", &cfg.visuals.players.bSkeleton);
+        ImGui::Combo("Box Type", reinterpret_cast<int*>(&cfg.visuals.players.boxType), boxes, IM_ARRAYSIZE(boxes));
+        ImGui::Combo("Health Bar Type", reinterpret_cast<int*>(&cfg.visuals.players.barType), bars, IM_ARRAYSIZE(bars));
+        ImGui::ColorEdit4("Visible Enemy", &cfg.visuals.players.enemyColorVis.x, 0); ImGui::SameLine();
+        ImGui::ColorEdit4("Invisible Enemy", &cfg.visuals.players.enemyColorInv.x, 0);
+        ImGui::ColorEdit4("Visible Team", &cfg.visuals.players.teamColorVis.x, 0); ImGui::SameLine();
+        ImGui::ColorEdit4("Invisible Team", &cfg.visuals.players.teamColorInv.x, 0);
+        ImGui::ColorEdit4("Text", &cfg.visuals.players.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.players.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::NextColumn();
+
+        ImGui::Text("Skeletons");
+        ImGui::BeginChild("Skeleton ESP", ImVec2(ImGuiHelper::getWidth(), 300), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.skeletons.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.skeletons.bName);
+        ImGui::Combo("Box Type", reinterpret_cast<int*>(&cfg.visuals.skeletons.boxType), boxes, IM_ARRAYSIZE(boxes));
+        ImGui::ColorEdit4("Visible", &cfg.visuals.skeletons.colorVis.x, 0); ImGui::SameLine();
+        ImGui::ColorEdit4("Invisible", &cfg.visuals.skeletons.colorInv.x, 0);
+        ImGui::ColorEdit4("Text", &cfg.visuals.skeletons.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.skeletons.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Ships");
+        ImGui::BeginChild("Ship ESP", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.ships.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.ships.bName);
+        ImGui::Checkbox("Show Holes", &cfg.visuals.ships.bDamage);
+        ImGui::ColorEdit4("Damage", &cfg.visuals.ships.damageColor.x, 0); ImGui::SameLine();
+        ImGui::ColorEdit4("Text", &cfg.visuals.ships.textCol.x, 0);
+
+        ImGui::EndChild();
+
+        
+
+
+
+        //ImGui::BeginChild("aimassist3", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        //ImGui::EndChild();
+
+        break;
+    }
+    case 1: {
+        ImGui::Columns(3, nullptr, false);
+        ImGui::SetColumnOffset(1, 525);
+        ImGui::SetColumnOffset(2, 850);
+        ImGui::Text("Islands");
+        ImGui::BeginChild("Islands", ImVec2(ImGuiHelper::getWidth(), 138), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.islands.bEnable);
+        ImGui::Checkbox("Draw Names", &cfg.visuals.islands.bName);
+        ImGui::SliderInt("Max Distance", &cfg.visuals.islands.intMaxDist, 100, 2750, "%d", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::Spacing();
+        ImGui::ColorEdit4("Text", &cfg.visuals.islands.textCol.x, 0);
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Items");
+        ImGui::BeginChild("Items", ImVec2(ImGuiHelper::getWidth(), 255), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.items.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.items.bName);
+        ImGui::Checkbox("Barrels", &cfg.visuals.items.barrelitems);
+        ImGui::Checkbox("Ammo Chests", &cfg.visuals.items.ammochests);
+        ImGui::ColorEdit4("Text ", &cfg.visuals.items.textCol.x, 0); ImGui::SameLine();
+        ImGui::ColorEdit4("Barrel Text ", &cfg.visuals.items.barreltextCol.x, 0); ImGui::SameLine();
+        ImGui::ColorEdit4("Ammo Chest ", &cfg.visuals.items.ammotextCol.x, 0);
+        ImGui::SliderFloat("Item Draw Distance", &cfg.visuals.items.itemdrawdistance, 0.f, 5000.f, "%.0f");
+        ImGui::SliderFloat("Barrel Draw Distance", &cfg.visuals.items.barreldrawdistance, 0.f, 5000.f, "%.0f");
+        ImGui::SliderFloat("AmmoBox Draw Distance", &cfg.visuals.items.ammochestsdrawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Animals");
+        ImGui::BeginChild("Animals", ImVec2(ImGuiHelper::getWidth(), 138), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.animals.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.animals.bName);
+        ImGui::ColorEdit4("Text", &cfg.visuals.animals.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.animals.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+
+        ImGui::Text("World Events");
+        ImGui::BeginChild("World Events", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.world.bEnable);
+        ImGui::ColorEdit4("Text", &cfg.visuals.world.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.world.drawdistance, 0.f, 20000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::NextColumn();
+
+        ImGui::Text("Sharks");
+        ImGui::BeginChild("Sharks", ImVec2(ImGuiHelper::getWidth(), 125), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.sharks.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.sharks.bName);
+        ImGui::ColorEdit4("Text", &cfg.visuals.sharks.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.sharks.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Mermaids");
+        ImGui::BeginChild("Mermaids", ImVec2(ImGuiHelper::getWidth(), 125), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.mermaids.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.mermaids.bName);
+        ImGui::ColorEdit4("Text", &cfg.visuals.mermaids.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.mermaids.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Rowboats");
+        ImGui::BeginChild("Rowboats", ImVec2(ImGuiHelper::getWidth(), 125), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.rowboats.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.rowboats.bName);
+        ImGui::ColorEdit4("Text", &cfg.visuals.rowboats.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.rowboats.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Puzzles");
+        ImGui::BeginChild("Puzzles", ImVec2(ImGuiHelper::getWidth(), 125), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.puzzles.bEnable);
+        ImGui::Checkbox("Draw Doors", &cfg.visuals.puzzles.bDoor);
+        ImGui::ColorEdit4("Text", &cfg.visuals.puzzles.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.puzzles.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::NextColumn();
+
+        ImGui::Text("Shipwrecks");
+        ImGui::BeginChild("Shipwrecks", ImVec2(ImGuiHelper::getWidth(), 125), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.shipwrecks.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.shipwrecks.bName);
+        ImGui::ColorEdit4("Text", &cfg.visuals.shipwrecks.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.shipwrecks.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Megalodon");
+        ImGui::BeginChild("Megalodon", ImVec2(ImGuiHelper::getWidth(), 138), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.megalodon.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.megalodon.bName);
+        ImGui::ColorEdit4("Text", &cfg.visuals.megalodon.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.megalodon.drawdistance, 0.f, 5000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Seagulls");
+        ImGui::BeginChild("Seagulls", ImVec2(ImGuiHelper::getWidth(), 125), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.seagulls.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.seagulls.bName);
+        ImGui::ColorEdit4("Text", &cfg.visuals.seagulls.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.seagulls.drawdistance, 0.f, 20000.f, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+
+        ImGui::Text("Storm");
+        ImGui::BeginChild("Storm", ImVec2(ImGuiHelper::getWidth(), 125), true);
+        ImGui::Checkbox("Enable", &cfg.visuals.storm.bEnable);
+        ImGui::Checkbox("Draw Name", &cfg.visuals.storm.bName);
+        ImGui::ColorEdit4("Text", &cfg.visuals.storm.textCol.x, 0);
+        ImGui::SliderFloat("Draw Distance", &cfg.visuals.storm.drawdistance, 0.f, 15000.f, "%.0f");
+
+        ImGui::EndChild();
+
+
+        break;
+    }
+    case 2: {
+
+        ImGui::Text("Client");
+        ImGui::BeginChild("Client", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Crosshair", &cfg.visuals.client.bCrosshair); ImGui::SameLine();
+        if (cfg.visuals.client.bCrosshair)
+        {
+            ImGui::SetNextItemWidth(75.f);
+            ImGui::SliderFloat("Radius##1", &cfg.visuals.client.fCrosshair, 1.f, 100.f);
+            ImGui::SameLine();
+        }
+        ImGui::ColorEdit4("Crosshair Color", &cfg.visuals.client.crosshairColor.x, ImGuiColorEditFlags_DisplayRGB);
+
+        ImGui::Checkbox("Oxygen Level", &cfg.visuals.client.bOxygen);
+        ImGui::Checkbox("Compass", &cfg.visuals.client.bCompass);
+
+        ImGui::Checkbox("Debug", &cfg.visuals.client.bDebug);
+        if (cfg.visuals.client.bDebug)
+        {
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(150.f);
+            ImGui::SliderFloat("Radius##2", &cfg.visuals.client.fDebug, 1.f, 1000.f);
+        }
+
+        ImGui::Checkbox("Cannon Tracers", &cfg.visuals.client.b_cannon_tracers);
+        ImGui::SliderInt("Tracer Length", &cfg.visuals.client.cannon_tracers_length, 1, 400, "%d");
+        ImGui::Spacing();
+        ImGui::ColorEdit4("Tracer", &cfg.visuals.client.cannon_tracers_color.x, ImGuiColorEditFlags_DisplayRGB);
+        ImGui::EndChild();
+
+        break;
+    }
+    }
+
+    ImGui::EndChild();
+}
+
+void Cheat::Renderer::renderSubTab2() {
+    ImGuiHelper::drawTabHorizontally("subtab-2", ImVec2(ImGuiHelper::getWidth(), 50), { "General", "Weapons", "Other" }, selectedSubTab2);
+    ImGui::Spacing();
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
+    ImGui::BeginChild("modules-wrapper", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), false);
+    ImGui::PopStyleColor();
+
+    switch (selectedSubTab2) {
+    case 0: {
+        ImGui::Columns(2, nullptr, false);
+        ImGui::SetColumnOffset(1, 500);
+
+        ImGui::Checkbox("Global Misc Switch", &cfg.misc.bEnable);
+
+        ImGui::Text("Client");
+        ImGui::BeginChild("Client settings misc", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.misc.client.bEnable);
+        ImGui::Checkbox("Ship Info", &cfg.misc.client.bShipInfo);
+        ImGui::Checkbox("Map Pins", &cfg.misc.client.b_map_pins);
+        ImGui::Checkbox("Cooking Timer", &cfg.misc.client.b_cooking_timer);
+        ImGui::SliderFloat("FOV", &cfg.misc.client.fov, 90.f, 180.f, "%.0f");
+        //ImGui::SliderInt("Time", &cfg.misc.client.time, 0, 24, "%.0f");
+
+        ImGui::EndChild();
+
+        ImGui::NextColumn();
+
+        ImGui::Text("Macros");
+        ImGui::BeginChild("Macro settings", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.misc.macro.bEnable);
+        ImGui::Checkbox("Bunny Hop", &cfg.misc.macro.b_bunnyhop);
+        ImGui::Checkbox("Loot Sprint", &cfg.misc.macro.bLootsprint);
+        ImGui::Checkbox("Take Loot from Barrel", &cfg.misc.macro.takelootfrombarreltocrate);
+        ImGui::Checkbox("Disable Idle Kick", &cfg.misc.macro.bIdleKick);
+
+        ImGui::EndChild();
+        break;
+    }
+    case 1: {
+
+        ImGui::Text("Under construction");
+        break;
+    }
+    case 2: {
+        ImGui::Text("Players List");
+        ImGui::BeginChild("Players List", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.misc.game.bEnable);
+        ImGui::Checkbox("Show Players List", &cfg.misc.game.bShowPlayers);
+        ImGui::EndChild();
+        break;
+    }
+    }
+}
+
+void Cheat::Renderer::renderSubTab3() {
+    ImGuiHelper::drawTabHorizontally("subtab-3", ImVec2(ImGuiHelper::getWidth(), 50), { "Fishing", "SOON", "SOON"}, selectedSubTab3);
+    ImGui::Spacing();
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
+    ImGui::BeginChild("modules-wrapper", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), false);
+    ImGui::PopStyleColor();
+
+    switch (selectedSubTab3) {
+    case 0: {
+       // ImGui::Columns(2, nullptr, false);
+      //  ImGui::SetColumnOffset(1, 500);
+
+        //ImGui::Checkbox("Global Misc Switch", &cfg.misc.bEnable);
+
+        ImGui::Text("Fishing Bot");
+        ImGui::BeginChild("Fishing Bot", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.fishing.bEnable);
+        ImGui::EndChild();
+        break;
+    }
+    case 1: {
+        break;
+    }
+    case 2: {
+        break;
+    }
+    }
+}
+
+void Cheat::Renderer::renderLogo()
+{ 
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.f);
+    ImGui::BeginGroup(); { // group it so we can redirect to Website when its pressed
+        ImGui::BeginChild("Logo", ImVec2(158, 50), true, ImGuiWindowFlags_NoScrollbar);
+
+        //sf::Sprite sprite(*logoTx);
+        //ImGui::Image(sprite);
+
+        ImGui::PushFont(title_font);
+        ImGui::SameLine();
+
+        ImGui::SetCursorPos(ImVec2(30, 11)); // dont know how to center it sorry :>
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(255, 20, 147, 255));
+        ImGui::Text("crazy name");
+        ImGui::PopStyleColor();
+        ImGui::PopFont();
+
+        ImGui::EndChild();
+
+        /* if (ImGui::IsItemClicked(1)) { // redirect to a website/discord on right click
+             ::ShellExecuteA(NULL, obf("open").c_str(), obf("https://www.youtube.com/watch?v=dQw4w9WgXcQ").c_str(), NULL, NULL, SW_SHOWDEFAULT);
+         }*/
+
+        ImGui::EndGroup();
+    }
+    ImGui::PopStyleVar();
+}
+
+void Cheat::Renderer::renderUser() {
+
+    ImGuiStyle* style = &ImGui::GetStyle();
+    int height = 80;
+    ImGui::Dummy(ImVec2(0.0f, ImGui::GetContentRegionAvail().y - height - style->ItemSpacing.y));
+    ImGui::PushFont(font);
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.f);
+    ImGui::BeginChild("User", ImVec2(158, height), true, ImGuiWindowFlags_NoScrollbar);
+    ImGui::SetCursorPosX(30);
+    if (ImGui::Button("Save Settings"))
+    {
+        do {
+            wchar_t buf[MAX_PATH];
+            GetModuleFileNameW(hinstDLL, buf, MAX_PATH);
+            fs::path path = fs::path(buf).remove_filename() / ".settings";
+            auto file = CreateFileW(path.wstring().c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (file == INVALID_HANDLE_VALUE) break;
+            DWORD written;
+            if (WriteFile(file, &cfg, sizeof(cfg), &written, 0)) ImGui::OpenPopup("##SettingsSaved");
+            CloseHandle(file);
+        } while (false);
+    }
+    ImGui::SetCursorPosX(30);
+    if (ImGui::Button("Load Settings"))
+    {
+        do {
+            wchar_t buf[MAX_PATH];
+            GetModuleFileNameW(hinstDLL, buf, MAX_PATH);
+            fs::path path = fs::path(buf).remove_filename() / ".settings";
+            auto file = CreateFileW(path.wstring().c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (file == INVALID_HANDLE_VALUE) break;
+            DWORD readed;
+            if (ReadFile(file, &cfg, sizeof(cfg), &readed, 0))  ImGui::OpenPopup("##SettingsLoaded");
+            CloseHandle(file);
+        } while (false);
+    }
+    //ImGui::TextUnformatted("User:");
+    //ImGui::TextUnformatted("xyz");
+    ImGui::PopStyleVar();
+    ImGui::PopFont();
+
+    ImGui::EndChild();
+}
+void Cheat::Renderer::renderTabs() {
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.f);
+    ImGui::BeginChild("tabs", ImVec2(158, 220), true);
+
+    /*ImGuiTextFilter2 filter;
+    filter.Draw2(ICON_FA_SEARCH" search"), 140);*/
+    ImGui::Spacing();
+
+    ImVec4 col(0, 0, 0, 0);
+    ImVec4 col2(255, 20, 147, 225);
+    ImVec4 coltext(255, 255, 255, 255);
+    ImGuiStyle* style = &ImGui::GetStyle();
+
+    style->Colors[ImGuiCol_Button] = ImColor(255, 20, 147, 225);
+    style->Colors[ImGuiCol_ButtonActive] = ImColor(255, 20, 147, 225);
+    style->Colors[ImGuiCol_ButtonHovered] = ImColor(41, 40, 41, 255);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5); // round buttons
+    std::string tabNames[] = { (ICON_FA_CROSSHAIRS " aimbot"), ICON_FA_EYE " visuals", ICON_FA_COG " misc", ICON_FA_BOOK " automation" };
+    for (int i = 0; i < sizeof(tabNames) / sizeof(tabNames[0]); i++) {
+        std::string it = tabNames[i];
+        //ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0.5));
+        //ImGui::PushStyleColor(ImGuiCol_Button, selectedTab == i ? col2 : col);
+       //ImGui::PushStyleColor(ImGuiCol_Text, selectedTab == i ? col2 : coltext);
+        //ImGui::PushStyleColor(ImGuiCol_ButtonActive, col2);
+        if (ImGui::Button(it.c_str(), ImVec2(140, 40))) selectedTab = i;
+       // ImGui::PopStyleVar();
+        //ImGui::PopStyleColor(2);
+    }
+    ImGui::PopStyleVar(2);
+
+    ImGui::EndChild();
 }
 
 inline bool Cheat::Renderer::Remove()
