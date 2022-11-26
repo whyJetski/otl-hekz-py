@@ -2671,25 +2671,13 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                         current_ship_pin_world.X = current_ship.Location.X;
                                         current_ship_pin_world.Y = current_ship.Location.Y;
                                         current_ship_pin_world.Z = 0.f;
-
+                                        const int dist = localLoc.DistTo(current_ship_pin_world) * 0.01f;
                                         FVector2D screen;
+                                        if (dist < 3500.f) continue;
                                         if (localController->ProjectWorldLocationToScreen(current_ship_pin_world, screen))
                                         {
-                                            const int dist = localLoc.DistTo(current_ship_pin_world) * 0.01f;
-                                            //const int reaperslevel = current_ship.ReapersMarkLevel;
-                                            //const int asd = current_ship.EmissaryLevel;
-                                           // std::string name = std::string(current_ship.OwnerFactionName.GetName());
-                                           // std::string faction_name;
-                                            //FACTIONB = REAPER
-                                           // std::wstring nameW = std::wstring(nameW.begin(), nameW.end());
                                             char buf[0x64];
-                                            /*if (type.find("BP_Small") != std::string::npos)
-                                                sprintf(buf, "Sloop\n(%d%% Water)\n[%dm] [%.0fm/s]", amount, dist, speed);
-                                            else if (type.find("BP_Medium") != std::string::npos)
-                                                sprintf(buf, "Brig (%d%% Water) [%dm] [%.0fm/s]", amount, dist, speed);
-                                            if (current_ship.ReapersMarkLevel == 0)*/
-                                            if (dist > 3500.f)
-                                                snprintf(buf, sizeof(buf), "Ship [%dm]", dist);
+                                            snprintf(buf, sizeof(buf), "Ship [%dm]", dist);
                                            /* else if (dist < 3500.f && asd != 0)
                                                 snprintf(buf, sizeof(buf), "[Reaper: %d]", asd);
                                             else if (dist > 3500.f && asd == 0)
