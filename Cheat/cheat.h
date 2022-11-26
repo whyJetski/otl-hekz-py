@@ -5,6 +5,11 @@
 #include <imgui/imgui.h>
 #include "SDK.h"
 
+static int getMapNameCode(char* name);
+static std::string getIslandNameByCode(int code);
+static std::string getShortName(std::string name);
+static UAthenaGameViewportClient* AthenaGameViewportClient = nullptr;
+
 class Cheat {
 private:
     static inline struct Cache{
@@ -240,6 +245,7 @@ private:
                 float fPitch = 1.f;
                 float fSmoothness = 1.f;
                 bool randomshots = false;
+                bool lowAim = false;
             } cannon;
         } aim;
         
@@ -298,7 +304,13 @@ private:
                 bool freecam = false;
                 bool tpitems = false;
                 float itemdistance = 0.f;
+                bool b_ship_pins = true;
+                bool barrelstoggle = true;
             } others;
+            struct
+            {
+                bool bEnable = true;
+            } xmarks;
         } misc;
         struct
         {
@@ -362,6 +374,7 @@ private:
 		static inline bool Init();
 		static inline bool Remove();
         static inline int selectedTab = 0, selectedSubTab0 = 0, selectedSubTab1 = 0, selectedSubTab2 = 0, selectedSubTab3 = 0, elementSize = 120;
+
 	};
 	class Tools {
 	private:

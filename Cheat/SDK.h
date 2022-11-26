@@ -230,6 +230,13 @@ inline void ProcessEvent(void* obj, UFunction* function, void* parms)
 	reinterpret_cast<void(*)(void*, UFunction*, void*)>(vtable[55])(obj, function, parms);
 }
 
+template<typename Fn>
+inline Fn GetVFunction(const void* instance, std::size_t index)
+{
+	auto vtable = *reinterpret_cast<const void***>(const_cast<void*>(instance));
+	return reinterpret_cast<Fn>(vtable[index]);
+}
+
 class UClass : public UStruct
 {
 public:
@@ -242,6 +249,10 @@ public:
 		return static_cast<T*>(CreateDefaultObject());
 	}
 
+	inline UObject* CreateDefaultObject()
+	{
+		return GetVFunction<UObject* (*)(UClass*)>(this, 88)(this);
+	}
 
 };
 
@@ -280,6 +291,13 @@ public:
 	int multi(char* name, int size) const
 	{
 		return WideCharToMultiByte(CP_UTF8, 0, Data, Count, name, size, nullptr, nullptr) - 1;
+	}
+
+	inline const wchar_t* c_str() const
+	{
+		if (Data)
+			return Data;
+		return L"";
 	}
 };
 
@@ -388,6 +406,24 @@ struct UFOVHandlerFunctions_SetTargetFOV_Params
 		ProcessEvent(this, fn, &params);
 	}
 };
+
+FVector2D RotatePoint(FVector2D pointToRotate, FVector2D centerPoint, float angle, bool angleInRadians = false)
+{
+	if (!angleInRadians)
+		angle = static_cast<float>(angle * (PI / 180.f));
+	float cosTheta = static_cast<float>(cos(angle));
+	float sinTheta = static_cast<float>(sin(angle));
+	FVector2D returnVec = FVector2D(cosTheta * (pointToRotate.X - centerPoint.X) - sinTheta * (pointToRotate.Y - centerPoint.Y), sinTheta * (pointToRotate.X - centerPoint.X) + cosTheta * (pointToRotate.Y - centerPoint.Y)
+	);
+	returnVec += centerPoint;
+	return returnVec;
+}
+
+struct FText
+{
+	char UnknownData[0x38];
+};
+
 // 11.06
 struct FCameraCacheEntry {
 	float TimeStamp;
@@ -610,6 +646,31 @@ struct USkeletalMeshComponent {
 	}
 };
 
+struct UScriptViewportClient : UObject {
+	char UnknownData_28[0x8]; // 0x28(0x08)
+};
+
+// Class Engine.GameViewportClient
+// Size: 0x250 (Inherited: 0x30)
+struct UGameViewportClient : UScriptViewportClient {
+	char UnknownData_30[0x8]; // 0x30(0x08)
+	struct UConsole* ViewportConsole; // 0x38(0x08)
+	char DebugProperties[0x10]; // 0x40(0x10)
+	char UnknownData_50[0x30]; // 0x50(0x30)
+	struct UWorld* World; // 0x80(0x08)
+	struct UGameInstance* GameInstance; // 0x88(0x08)
+	char UnknownData_90[0x1c0]; // 0x90(0x1c0)
+
+	void SSSwapControllers(); // Function Engine.GameViewportClient.SSSwapControllers // Exec|Native|Public // @ game+0x2fe5ca0
+	void ShowTitleSafeArea(); // Function Engine.GameViewportClient.ShowTitleSafeArea // Exec|Native|Public // @ game+0x2fe5d50
+	void SetConsoleTarget(int32_t PlayerIndex); // Function Engine.GameViewportClient.SetConsoleTarget // Exec|Native|Public // @ game+0x2fe5cc0
+};
+
+struct UAthenaGameViewportClient : UGameViewportClient {
+	char UnknownData_250[0x10]; // 0x250(0x10)
+};
+
+
 struct AShipInternalWater {
 	float GetNormalizedWaterAmount() {
 		static auto fn = UObject::FindObject<UFunction>("Function Athena.ShipInternalWater.GetNormalizedWaterAmount");
@@ -618,10 +679,17 @@ struct AShipInternalWater {
 		return params;
 	}
 };
+
+struct ADamageZone {
+	char pad[0x0654];
+	int32_t DamageLevel; // 0x654(0x04)
+};
+
 //11.22
 struct AHullDamage {
-	char pad[0x0420];
-	TArray<class ACharacter*> ActiveHullDamageZones; // 0x0420 
+	char pad[0x0410];
+	struct TArray<struct ADamageZone*> DamageZones; // 0x410(0x10)
+	TArray<class ACharacter*> ActiveHullDamageZones; // 0x0420
 };
 
 struct UDrowningComponent {
@@ -659,6 +727,303 @@ struct FAIEncounterSpecification
 	char pad[0x80];
 	FString* LocalisableName; // 0x0080 
 };
+
+struct FStorageContainerNode {
+	struct UClass* ItemDesc; // 0x00(0x08)
+	int32_t NumItems; // 0x08(0x04)
+	char UnknownData_C[0x4]; // 0x0c(0x04)
+};
+
+struct FStorageContainerBackingStore {
+	char pad_0[0x20];
+	struct TArray<struct FStorageContainerNode> ContainerNodes; // 0x20(0x10)
+	bool AllowedItemsAreCached; // 0x30(0x01)
+	char UnknownData_31[0x7]; // 0x31(0x07)
+	char CachedAllowedItems[0x8]; // 0x38(0x08)
+};
+
+
+struct UStorageContainerComponent {
+	char pad_00[0xc8];
+	char UnknownData_C8[0x18]; // 0xc8(0x18)
+	char ContainerDisplayName[0x38]; // 0xe0(0x38)
+	char UnknownData_118[0x8]; // 0x118(0x08)
+	char InstanceTransform[0x30]; // 0x120(0x30)
+	struct FStorageContainerBackingStore ContainerNodes; // 0x150(0x40)
+	struct TArray<struct AActor*> QuickGivers; // 0x190(0x10)
+	struct TArray<struct AActor*> QuickTakers; // 0x1a0(0x10)
+	char AddItemSFX[0x8]; // 0x1b0(0x08)
+	char TakeItemSFX[0x8]; // 0x1b8(0x08)
+	char OpenContainerSFX[0x8]; // 0x1c0(0x08)
+	char BeginQuickGiveSFX[0x8]; // 0x1c8(0x08)
+	char EndQuickGiveSFX[0x8]; // 0x1d0(0x08)
+	char BeginQuickTakeSFX[0x8]; // 0x1d8(0x08)
+	char EndQuickTakeSFX[0x8]; // 0x1e0(0x08)
+	char StorageContainerSelector[0x8]; // 0x1e8(0x08)
+	char UnknownData_1F0[0x30]; // 0x1f0(0x30)
+	char SfxPool[0x8]; // 0x220(0x08)
+	char UnknownData_228[0x40]; // 0x228(0x40)
+	bool ShowCapacityInDescription; // 0x268(0x01)
+	char UnknownData_269[0x9f]; // 0x269(0x9f)
+	char Aggregator[0x8]; // 0x308(0x08)
+
+	//void TakeItem(struct AActor* Player, int32_t NodeIndex); // Function Athena.StorageContainerComponent.TakeItem // Final|Native|Public|BlueprintCallable // @ game+0x38b5810
+	//void OnRep_QuickTakers(struct TArray<struct AActor*> InOldTakers); // Function Athena.StorageContainerComponent.OnRep_QuickTakers // Final|Native|Private // @ game+0x38b5560
+	//void OnRep_QuickGivers(struct TArray<struct AActor*> InOldGivers); // Function Athena.StorageContainerComponent.OnRep_QuickGivers // Final|Native|Private // @ game+0x38b5460
+	//void OnRep_ContentsChanged(struct FStorageContainerBackingStore InOldItemCount); // Function Athena.StorageContainerComponent.OnRep_ContentsChanged // Final|Native|Private // @ game+0x38b52d0
+	//void Multicast_DetachAllPlayersRPC(); // Function Athena.StorageContainerComponent.Multicast_DetachAllPlayersRPC // Final|Net|NetReliableNative|Event|NetMulticast|Private // @ game+0x38b52b0
+	//struct FText GetContainerDisplayName(); // Function Athena.StorageContainerComponent.GetContainerDisplayName // Final|Native|Public|BlueprintCallable|BlueprintPure|Const // @ game+0x38b5220
+	//void AddItem(struct AActor* Player, struct UClass* InItemDesc); // Function Athena.StorageContainerComponent.AddItem // Final|Native|Public|BlueprintCallable // @ game+0x38b5010
+};
+
+struct AStorageContainer {
+	char pad_00[0x468];
+	char UnknownData_468[0x8]; // 0x468(0x08)
+	char Mesh[0x8]; // 0x470(0x08)
+	char InteractionRegion[0x8]; // 0x478(0x08)
+	char UnknownData_480[0x14]; // 0x480(0x14)
+	char TrackedActorType; // 0x494(0x01)
+	char UnknownData_495[0x33]; // 0x495(0x33)
+	char random_Bytes[0x10];
+	class UStorageContainerComponent* StorageContainer;
+};
+
+struct FVector_NetQuantize : public FVector
+{
+
+};
+
+//11.06 ez is jo sztem 11.22
+struct FHitResult
+{
+	unsigned char                                      bBlockingHit : 1;                                         // 0x0000(0x0001)
+	unsigned char                                      bStartPenetrating : 1;                                    // 0x0000(0x0001)
+	unsigned char                                      UnknownData00[0x3];                                       // 0x0001(0x0003) MISSED OFFSET
+	float                                              Time;                                                     // 0x0004(0x0004) (ZeroConstructor, IsPlainOldData)
+	float                                              Distance;                                                 // 0x0008(0x0004) (ZeroConstructor, IsPlainOldData)
+	struct FVector_NetQuantize                         ImpactPoint;                                              // 0x0018(0x000C)
+	char pad_5894[0x48];
+	float                                              PenetrationDepth;                                         // 0x0054(0x0004) (ZeroConstructor, IsPlainOldData)
+	int                                                Item;                                                     // 0x0058(0x0004) (ZeroConstructor, IsPlainOldData)
+	char pad_3424[0x18];
+	struct FName                                       BoneName;                                                 // 0x0074(0x0008) (ZeroConstructor, IsPlainOldData)
+	int                                                FaceIndex;                                                // 0x007C(0x0004) (ZeroConstructor, IsPlainOldData)
+};
+
+struct FRepMovement {
+	struct FVector LinearVelocity; // 0x00(0x0c)
+	struct FVector AngularVelocity; // 0x0c(0x0c)
+	struct FVector Location; // 0x18(0x0c)
+	struct FRotator Rotation; // 0x24(0x0c)
+	char bSimulatedPhysicSleep : 1; // 0x30(0x01)
+	char bRepPhysics : 1; // 0x30(0x01)
+	char UnknownData_30_2 : 6; // 0x30(0x01)
+	char LocationQuantizationLevel; // 0x31(0x01)
+	char VelocityQuantizationLevel; // 0x32(0x01)
+	char RotationQuantizationLevel; // 0x33(0x01)
+	char UnknownData_34[0x4]; // 0x34(0x04)
+};
+
+struct AShipReplicatedM {
+	char pad_0[0x90];
+	struct FRepMovement ReplicatedMovement; // 0x94(0x38)
+};
+
+struct AActor : UObject {
+	char PrimaryActorTick[0x50]; // 0x28(0x50)
+	float CustomTimeDilation; // 0x78(0x04)
+	char bAllowRemovalFromServerWhenCollisionMerged : 1; // 0x7c(0x01)
+	char bAllowRemovalFromServerWhenAutomaticallyInstanced : 1; // 0x7c(0x01)
+	char bHidden : 1; // 0x7c(0x01)
+	char bNetTemporary : 1; // 0x7c(0x01)
+	char bNetStartup : 1; // 0x7c(0x01)
+	char bOnlyRelevantToOwner : 1; // 0x7c(0x01)
+	char bAlwaysRelevant : 1; // 0x7c(0x01)
+	char bReplicateMovement : 1; // 0x7c(0x01)
+	char bTearOff : 1; // 0x7d(0x01)
+	char bExchangedRoles : 1; // 0x7d(0x01)
+	char bPendingNetUpdate : 1; // 0x7d(0x01)
+	char bNetLoadOnClient : 1; // 0x7d(0x01)
+	char bNetUseOwnerRelevancy : 1; // 0x7d(0x01)
+	char bBlockInput : 1; // 0x7d(0x01)
+	char UnknownData_7D_6 : 1; // 0x7d(0x01)
+	char bCanBeInCluster : 1; // 0x7d(0x01)
+	char UnknownData_7E_0 : 2; // 0x7e(0x01)
+	char bActorEnableCollision : 1; // 0x7e(0x01)
+	char UnknownData_7E_3 : 1; // 0x7e(0x01)
+	char bReplicateAttachment : 1; // 0x7e(0x01)
+	char UnknownData_7E_5 : 1; // 0x7e(0x01)
+	char bReplicates : 1; // 0x7e(0x01)
+	char UnknownData_7F[0x1]; // 0x7f(0x01)
+	char OnPreNetOwnershipChange[0x1]; // 0x80(0x01)
+	char UnknownData_81[0x1]; // 0x81(0x01)
+	char RemoteRole; // 0x82(0x01)
+	char UnknownData_83[0x5]; // 0x83(0x05)
+	struct AActor* Owner; // 0x88(0x08)
+	char SpawnRestrictions; // 0x90(0x01)
+	char UnknownData_91[0x3]; // 0x91(0x03)
+	struct FRepMovement ReplicatedMovement; // 0x94(0x38)
+	char UnknownData_CC[0x4]; // 0xcc(0x04)
+	char AttachmentReplication[0x48]; // 0xd0(0x48)
+	char Role; // 0x118(0x01)
+	char UnknownData_119[0x1]; // 0x119(0x01)
+	char AutoReceiveInput; // 0x11a(0x01)
+	char UnknownData_11B[0x1]; // 0x11b(0x01)
+	int32_t InputPriority; // 0x11c(0x04)
+	struct UInputComponent* InputComponent; // 0x120(0x08)
+	float NetCullDistanceSquared; // 0x128(0x04)
+	char UnknownData_12C[0x4]; // 0x12c(0x04)
+	int32_t NetTag; // 0x130(0x04)
+	float NetUpdateTime; // 0x134(0x04)
+	float NetUpdateFrequency; // 0x138(0x04)
+	float NetPriority; // 0x13c(0x04)
+	float LastNetUpdateTime; // 0x140(0x04)
+	struct FName NetDriverName; // 0x144(0x08)
+	char bAutoDestroyWhenFinished : 1; // 0x14c(0x01)
+	char bCanBeDamaged : 1; // 0x14c(0x01)
+	char bActorIsBeingDestroyed : 1; // 0x14c(0x01)
+	char bCollideWhenPlacing : 1; // 0x14c(0x01)
+	char bFindCameraComponentWhenViewTarget : 1; // 0x14c(0x01)
+	char bRelevantForNetworkReplays : 1; // 0x14c(0x01)
+	char UnknownData_14C_6 : 2; // 0x14c(0x01)
+	char UnknownData_14D[0x3]; // 0x14d(0x03)
+	char SpawnCollisionHandlingMethod; // 0x150(0x01)
+	char UnknownData_151[0x7]; // 0x151(0x07)
+	struct APawn* Instigator; // 0x158(0x08)
+	struct TArray<struct AActor*> Children; // 0x160(0x10)
+	struct USceneComponent* RootComponent; // 0x170(0x08)
+	struct TArray<struct AMatineeActor*> ControllingMatineeActors; // 0x178(0x10)
+	float InitialLifeSpan; // 0x188(0x04)
+	char UnknownData_18C[0x4]; // 0x18c(0x04)
+	char bAllowReceiveTickEventOnDedicatedServer : 1; // 0x190(0x01)
+	char UnknownData_190_1 : 7; // 0x190(0x01)
+	char UnknownData_191[0x7]; // 0x191(0x07)
+	struct TArray<struct FName> Layers; // 0x198(0x10)
+	char ParentComponentActor[0x8]; // 0x1a8(0x08)
+	struct TArray<struct AActor*> ChildComponentActors; // 0x1b0(0x10)
+	char UnknownData_1C0[0x8]; // 0x1c0(0x08)
+	char bActorSeamlessTraveled : 1; // 0x1c8(0x01)
+	char bIgnoresOriginShifting : 1; // 0x1c8(0x01)
+	char bEnableAutoLODGeneration : 1; // 0x1c8(0x01)
+	char InvertFeatureCheck : 1; // 0x1c8(0x01)
+	char UnknownData_1C8_4 : 4; // 0x1c8(0x01)
+	char UnknownData_1C9[0x3]; // 0x1c9(0x03)
+	struct FName Feature; // 0x1cc(0x08)
+	char UnknownData_1D4[0x4]; // 0x1d4(0x04)
+	struct TArray<struct FName> Tags; // 0x1d8(0x10)
+	uint64_t HiddenEditorViews; // 0x1e8(0x08)
+	char UnknownData_1F0[0x4]; // 0x1f0(0x04)
+	char UnknownData_1F4[0x3c]; // 0x1f4(0x3c)
+	char OnEndPlay[0x1]; // 0x230(0x01)
+	bool bDoOverlapNotifiesOnLoad; // 0x231(0x01)
+	char UnknownData_232[0xf6]; // 0x232(0xf6)
+	struct TArray<struct UActorComponent*> BlueprintCreatedComponents; // 0x328(0x10)
+	struct TArray<struct UActorComponent*> InstanceComponents; // 0x338(0x10)
+	char UnknownData_348[0x8]; // 0x348(0x08)
+	struct TArray<struct AActor*> ChildActorInterfaceProviders; // 0x350(0x10)
+	char UnknownData_360[0x68]; // 0x360(0x68)
+	double DormancyLingeringInSeconds; // 0x3c8(0x08)
+
+	struct FVector GetActorRightVector()
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.Actor.GetActorRightVector");
+		FVector ReturnValue;
+		ProcessEvent(this, fn, &ReturnValue);
+		return ReturnValue;
+	}
+};
+
+struct ANamedPawn {
+	char pad[0x3e8];
+	struct APlayerState* PlayerState; // 0x3e8(0x08)
+};
+// Class Engine.Pawn
+// Size: 0x448 (Inherited: 0x3d0)
+struct APawn : AActor {
+	char pad[0x20];
+	struct APlayerState* PlayerState; // 0x3f0(0x08)
+	char pad2[0x50];
+};
+
+struct FWorldMapIslandDataCaptureParams
+{
+	char pad1[0x0018];
+	struct FVector                                     WorldSpaceCameraPosition;                                  // 0x0018(0x000C) (Edit, ZeroConstructor, Transient, EditConst, IsPlainOldData, NoDestructor)
+	char pad2[0x8];
+	float                                              CameraOrthoWidth;                                          // 0x002C(0x0004) (Edit, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash)
+
+};
+
+struct UWorldMapIslandDataAsset {
+	char pad[0x0030];
+	struct FWorldMapIslandDataCaptureParams            CaptureParams;                                             // 0x0030(0x0040) (Edit, BlueprintVisible, BlueprintReadOnly)
+	FVector WorldSpaceCameraPosition;
+	// ADD THE OFFSET OF CAPTUREPARAMS TO THIS OFFSET
+};
+
+// Class Athena.IslandDataAssetEntry
+// Size: 0x118 (Inherited: 0x28)
+struct UIslandDataAssetEntry {
+	char pad_00[0x28];
+	struct FName IslandName; // 0x28(0x08)
+	struct TArray<struct FTreasureMapData> TreasureMaps; // 0x30(0x10)
+	struct UWorldMapIslandDataAsset* WorldMapData; // 0x40(0x08)
+	struct UGeneratedLocationsDataAsset* UndergroundTreasureLocationsSource; // 0x48(0x08)
+	struct TArray<struct FVector> UndergroundTreasureLocations; // 0x50(0x10)
+	struct ULandmarkTreasureLocationsDataAsset* LandmarkTreasureLocationsSource; // 0x60(0x08)
+	struct UGeneratedLocationsDataAsset* AISpawnLocationsSource; // 0x68(0x08)
+	struct TArray<struct FVector> AISpawnLocations; // 0x70(0x10)
+	struct TArray<struct UIslandItemDataAsset*> IslandItemLocationDataSources; // 0x80(0x10)
+	struct TArray<struct UIslandSalvageSpawnerCollection*> IslandSalvageSpawnerCollections; // 0x90(0x10)
+	struct TArray<struct FTypedIslandItemSpawnLocationData> SalvageItemsLocationData; // 0xa0(0x10)
+	FString* LocalisedName; // 0xb0(0x38)
+	struct UAISpawner* AISpawner; // 0xe8(0x08)
+	struct UAISpawner* CannonsAISpawner; // 0xf0(0x08)
+	struct UAISpawner* EmergentCaptainSpawner; // 0xf8(0x08)
+	struct UIslandMaterialStatusZone* IslandMaterialStatusZone; // 0x100(0x08)
+	char StatToFireWhenPlayerSetsFootOnIsland[0x4]; // 0x108(0x04)
+	char StatToFireWhenShipVisitsAnIsland[0x4]; // 0x10c(0x04)
+	bool ShouldBeHiddenOnWorldMap; // 0x110(0x01)
+	bool UseAdvancedSearchForMermaidSpawn; // 0x111(0x01)
+	char IslandActiveEventType; // 0x112(0x01)
+	char UnknownData_113[0x5]; // 0x113(0x05)
+};
+
+struct UIslandDataAsset {
+	char pad[0x0048];
+	struct TArray<struct UIslandDataAssetEntry*> IslandDataEntries; // 0x48(0x10)
+};
+
+struct AIslandService {
+	char pad[0x0458];
+	UIslandDataAsset* IslandDataAsset; // 0x458
+};
+
+struct FXMarksTheSpotMapMark {
+	struct FVector2D Position; // 0x00(0x08)
+	float Rotation; // 0x08(0x04)
+	bool IsUnderground; // 0x0c(0x01)
+	char UnknownData_D[0x3]; // 0x0d(0x03)
+};
+
+struct AXMarksTheSpotMap
+{
+	char pad1[0x0808];
+	//struct FString                                     MapTexturePath;                                            // 0x0818(0x0010) (Net, ZeroConstructor, RepNotify, HasGetValueTypeHash)
+	//char pad2[0x80];
+	//TArray<struct FXMarksTheSpotMapMark>               Marks;                                                     // 0x08A8(0x0010) (Net, ZeroConstructor, RepNotify)
+	//char pad3[0x18];
+	//float                                              Rotation;                                                  // 0x08D0(0x0004) (Net, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash)
+
+
+	struct FString MapTexturePath; // 0x808(0x10)
+	char MapInventoryTexturePath[0x10]; // 0x818(0x10)
+	char UnknownData_828[0x70]; // 0x828(0x70)
+	struct TArray<struct FXMarksTheSpotMapMark> Marks; // 0x898(0x10)
+	char UnknownData_8A8[0x18]; // 0x8a8(0x18)
+	float Rotation; // 0x8c0(0x04)
+};
+
 //11.22
 struct UWieldedItemComponent {
 	char pad[0x02F0];
@@ -800,44 +1165,7 @@ struct AProjectileWeapon {
 
 };
 
-//11.06 ez is jo sztem 11.22
-struct FHitResult
-{
-	unsigned char                                      bBlockingHit : 1;                                         // 0x0000(0x0001)
-	unsigned char                                      bStartPenetrating : 1;                                    // 0x0000(0x0001)
-	unsigned char                                      UnknownData00[0x3];                                       // 0x0001(0x0003) MISSED OFFSET
-	float                                              Time;                                                     // 0x0004(0x0004) (ZeroConstructor, IsPlainOldData)
-	float                                              Distance;                                                 // 0x0008(0x0004) (ZeroConstructor, IsPlainOldData)
-	char pad_5894[0x48];
-	float                                              PenetrationDepth;                                         // 0x0054(0x0004) (ZeroConstructor, IsPlainOldData)
-	int                                                Item;                                                     // 0x0058(0x0004) (ZeroConstructor, IsPlainOldData)
-	char pad_3424[0x18];
-	struct FName                                       BoneName;                                                 // 0x0074(0x0008) (ZeroConstructor, IsPlainOldData)
-	int                                                FaceIndex;                                                // 0x007C(0x0004) (ZeroConstructor, IsPlainOldData)
-};
-//11.22
-struct UWorldMapIslandDataAsset {
-	char pad[0x48]; //
-	FVector WorldSpaceCameraPosition; // 0x0018
-	// ADD THE OFFSET OF CAPTUREPARAMS TO THIS OFFSET				CaptureParams;                                     // 0x30(0x40)
-};
-//11.22
-struct UIslandDataAssetEntry {
-	char pad[0x40];
-	UWorldMapIslandDataAsset* WorldMapData; //  0x40(0x8)
-	char pad2[0x68];
-	FString* LocalisedName; // 0x00B0(0x38)
-};
-//11.22
-struct UIslandDataAsset {
-	char pad[0x0048];
-	TArray<UIslandDataAssetEntry*> IslandDataEntries; // 0x0048
-};
-//11.22
-struct AIslandService {
-	char pad[0x0458]; 
-	UIslandDataAsset* IslandDataAsset; // 0x458
-};
+
 //11.22
 struct ASlidingDoor {
 	char pad_0x0[0x534]; 
@@ -1339,6 +1667,15 @@ struct UItemDesc {
 	char pad[0x0028];
 	FString* Title; // 0x0028(0x38)
 };
+
+struct UItemDescEx : UObject {
+	struct FText Title; // 0x28(0x38)
+	struct FText Description; // 0x60(0x38)
+	//char pad_60[0x68];
+	char pad_98[0x30];
+	char pad_c0[0x58];
+};
+
 //11.22
 struct AItemInfo {
 	char pad[0x0440];
@@ -1717,6 +2054,16 @@ public:
 		return IsA(obj);
 	}
 
+	inline bool isMap() {
+		static auto obj = UObject::FindClass("Class Athena.TreasureMap");
+		return IsA(obj);
+	}
+
+	inline bool isXMarkMap() {
+		static auto obj = UObject::FindClass("Class Athena.XMarksTheSpotMap");
+		return IsA(obj);
+	}
+
 	inline bool isCannon() {
 		static auto obj = UObject::FindClass("Class Athena.Cannon");
 		return IsA(obj);
@@ -1828,6 +2175,11 @@ public:
 		return IsA(obj);
 	}
 
+	inline bool isStorageComponent() {
+		static auto obj = UObject::FindClass("Class Athena.StorageContainerComponent");
+		return IsA(obj);
+	}
+
 	bool isBuriedTreasure() {
 		static auto obj = UObject::FindClass("Class Athena.BuriedTreasureLocation");
 		return IsA(obj);
@@ -1925,7 +2277,78 @@ public:
 	}
 };
 
+class UKismetTextLibrary
+{
+private:
+	static inline UClass* defaultObj;
+public:
 
+	static UClass* StaticClass()
+	{
+		static auto ptr = UObject::FindObject<UClass>("Class Engine.KismetTextLibrary");
+		return ptr;
+	}
+
+
+	static struct FText TextTrimTrailing(const struct FText& InText);
+	static struct FText TextTrimPrecedingAndTrailing(const struct FText& InText);
+	static struct FText TextTrimPreceding(const struct FText& InText);
+	static bool TextIsTransient(const struct FText& InText);
+	static bool TextIsEmpty(const struct FText& InText);
+	static bool TextIsCultureInvariant(const struct FText& InText);
+	static bool NotEqual_TextText(const struct FText& A, const struct FText& B);
+	static bool NotEqual_IgnoreCase_TextText(const struct FText& A, const struct FText& B);
+	static struct FText GetEmptyText();
+	static struct FText Format(const struct FText& InPattern, TArray<struct FFormatTextArgument> InArgs);
+	static bool FindTextInLocalizationTable(const class FString& Namespace, const class FString& Key, struct FText* OutText);
+	static bool EqualEqual_TextText(const struct FText& A, const struct FText& B);
+	static bool EqualEqual_IgnoreCase_TextText(const struct FText& A, const struct FText& B);
+	//static class FString Conv_TextToString(const struct FText& InText);
+	static struct FText Conv_StringToText(const class FString& InString);
+	static class FString Conv_TextToString(const struct FText& InText)
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.KismetTextLibrary.Conv_TextToString");
+
+		struct
+		{
+			struct FText                   InText;
+			class FString                  ReturnValue;
+		} params;
+
+		params.InText = InText;
+
+		ProcessEvent(defaultObj, fn, &params);
+		return params.ReturnValue;
+	}
+
+	static struct FText Conv_NameToText(const struct FName& InName)
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.KismetTextLibrary.Conv_NameToText");
+
+		struct
+		{
+			struct FName                   InName;
+			struct FText                   ReturnValue;
+		} params;
+
+		params.InName = InName;
+
+		ProcessEvent(defaultObj, fn, &params);
+		return params.ReturnValue;
+	}
+	//static struct FText Conv_NameToText(const struct FName& InName);
+	static struct FText Conv_IntToText(int Value, bool bUseGrouping, int MinimumIntegralDigits, int MaximumIntegralDigits);
+	static struct FText Conv_FloatToText(float Value, char RoundingMode, bool bUseGrouping, int MinimumIntegralDigits, int MaximumIntegralDigits, int MinimumFractionalDigits, int MaximumFractionalDigits);
+	static struct FText Conv_ByteToText(unsigned char Value);
+	static struct FText Conv_BoolToText(bool InBool);
+	static struct FText AsTimespan_Timespan(const struct FTimespan& InTimespan);
+	static struct FText AsTime_DateTime(const struct FDateTime& In);
+	static struct FText AsPercent_Float(float Value, char RoundingMode, bool bUseGrouping, int MinimumIntegralDigits, int MaximumIntegralDigits, int MinimumFractionalDigits, int MaximumFractionalDigits);
+	static struct FText AsDateTime_DateTime(const struct FDateTime& In);
+	static struct FText AsDate_DateTime(const struct FDateTime& InDateTime);
+	static struct FText AsCurrency_Integer(int Value, char RoundingMode, bool bUseGrouping, int MinimumIntegralDigits, int MaximumIntegralDigits, int MinimumFractionalDigits, int MaximumFractionalDigits, const class FString& CurrencyCode);
+	static struct FText AsCurrency_Float(float Value, char RoundingMode, bool bUseGrouping, int MinimumIntegralDigits, int MaximumIntegralDigits, int MinimumFractionalDigits, int MaximumFractionalDigits, const class FString& CurrencyCode);
+};
 
 class UKismetMathLibrary {
 private:
@@ -2185,11 +2608,29 @@ struct AMeleeWeapon
 	char pad[0x07A8];
 	struct UMeleeWeaponDataAsset* DataAsset; //0x7A8 
 };
+struct FWorldMapShipLocation {
+	struct FGuid CrewId; // 0x00(0x10)
+	struct UClass* ShipSize; // 0x10(0x08)
+	struct FVector2D Location; // 0x18(0x08)
+	float Rotation; // 0x20(0x04)
+	char ReplicatedRotation; // 0x24(0x01)
+	char Flags; // 0x25(0x01)
+	char UnknownData_26[0x2]; // 0x26(0x02)
+	struct UTexture* CrewLiveryOverlayIcon; // 0x28(0x08)
+	char ReapersMarkLevel; // 0x30(0x01)
+	char EmissaryLevel; // 0x31(0x01)
+	bool OwnerIsInFaction; // 0x32(0x01)
+	bool OwnerIsMaxFaction; // 0x33(0x01)
+	struct FName OwnerFactionName; // 0x34(0x08)
+	bool OwnerIsInvadingShip; // 0x3c(0x01)
+	char UnknownData_3D[0x3]; // 0x3d(0x03)
+};
 //11.22
 struct AMapTable
 {
 	char pad[0x04E8];
 	TArray<struct FVector2D> MapPins; // 0x04E8
+	TArray<struct FWorldMapShipLocation> TrackedShips; // 0x4f8(0x10)
 };
 //11.22
 struct AInteractableBase {
@@ -2533,6 +2974,39 @@ struct FThrowGrenadeRpc : FBoxedRpc {
 	struct FRotator LocalLaunchAngle; // 0x1c(0x0c)
 	float LocalLaunchSpeed; // 0x28(0x04)
 	struct FVector LocalWielderVelocity; // 0x2c(0x0c)
+};
+
+struct ALightingController {
+	char pad[0x7a8];
+	struct UExponentialHeightFogComponent* Fog; // 0x7a8(0x08)
+	struct UExponentialHeightFogComponent* UnderwaterFog; // 0x7b0(0x08)
+	struct UPostProcessComponent* GlobalPostProcess; // 0x7b8(0x08)
+	struct UDirectionalLightComponent* RainLight; // 0x7c0(0x08)
+	struct UStaticMeshComponent* Moon; // 0x7c8(0x08)
+	struct USkyLightComponent* SkyLight; // 0x7d0(0x08)
+	float DebugTimeOfDay; // 0x7d8(0x04)
+	float DebugRain; // 0x7dc(0x04)
+	float DebugMurk; // 0x7e0(0x04)
+	int32_t DebugDay; // 0x7e4(0x04)
+	char IsDebugFixedTimeOfDay : 1; // 0x7e8(0x01)
+	char ShowDebugSunHeightInfo : 1; // 0x7e8(0x01)
+	char ShowDebugLightingZoneInfo : 1; // 0x7e8(0x01)
+	char ShowDebugUnderwater : 1; // 0x7e8(0x01)
+	char UnknownData_7E8_4 : 4; // 0x7e8(0x01)
+	char UnknownData_7E9[0x27]; // 0x7e9(0x27)
+	char pad2[0x480];
+	//struct FLightingControllerLightingVars LightingVars; // 0x810(0x460)
+	//struct FLightingControllerMaterialInstances MaterialInstances; // 0xc70(0x20)
+	struct TArray<struct AActor*> ReflectionProbes; // 0xc90(0x10)
+	char UnknownData_CA0[0x20]; // 0xca0(0x20)
+	struct TArray<struct FWaterModifierZoneParametersAndLocation> MurkZones; // 0xcc0(0x10)
+	char UnknownData_CD0[0xa8]; // 0xcd0(0xa8)
+	struct UCurveFloat* EndOfWorldLightingZoneWeightCurve; // 0xd78(0x08)
+	char UnknownData_D80[0xf0]; // 0xd80(0xf0)
+};
+
+struct FStringAssetReference {
+	struct FString AssetLongPathname; // 0x00(0x10)
 };
 
 #ifdef _MSC_VER

@@ -19,6 +19,407 @@
 #include "imgui_helper.h"
 
 
+std::string getShortName(std::string name)
+{
+    if (name.find("cannon_ball") != std::string::npos)
+        return "Cannon Ball";
+    if (name.find("cannonball_chain_shot") != std::string::npos)
+        return "Cannon Chain";
+    if (name.find("cannonball_Grenade") != std::string::npos)
+        return "Dispersion Ball";
+    if (name.find("cannonball_cur_fire") != std::string::npos)
+        return "Fire Ball";
+    if (name.find("cannonball_cur") != std::string::npos)
+        return "Cursed Cannon Ball";
+
+    if (name.find("repair_wood") != std::string::npos)
+        return "Wood";
+
+    if (name.find("PomegranateFresh") != std::string::npos)
+        return "Granate";
+    if (name.find("CoconutFresh") != std::string::npos)
+        return "Coconut";
+    if (name.find("BananaFresh") != std::string::npos)
+        return "Banana";
+    if (name.find("PineappleFresh") != std::string::npos)
+        return "Pineapple";
+    if (name.find("MangoFresh") != std::string::npos)
+        return "Mango";
+
+    if (name.find("GrubsFresh") != std::string::npos)
+        return "Grubs";
+    if (name.find("LeechesFresh") != std::string::npos)
+        return "Leeches";
+    if (name.find("EarthwormsFresh") != std::string::npos)
+        return "Earthworms";
+
+    if (name.find("fireworks_flare") != std::string::npos)
+        return "Flare";
+    if (name.find("fireworks_rocket") != std::string::npos)
+        return "Fireworks S";
+    if (name.find("fireworks_cake") != std::string::npos)
+        return "Fireworks M";
+    if (name.find("fireworks_living") != std::string::npos)
+        return "Fireworks L";
+
+    if (name.find("MapInABarrel") != std::string::npos)
+        return "Scroll";
+
+    if (name.find("hola") != std::string::npos)
+        return "Hola";
+    if (name.find("hola") != std::string::npos)
+        return "Hola";
+    if (name.find("hola") != std::string::npos)
+        return "Hola";
+    if (name.find("hola") != std::string::npos)
+        return "Hola";
+    if (name.find("hola") != std::string::npos)
+        return "Hola";
+    if (name.find("hola") != std::string::npos)
+        return "Hola";
+    return name;
+}
+
+int getMapNameCode(char* name)
+{
+    if (strstr(name, "wsp_resource_island_02_e") != NULL) // Barnacle Cay
+    {
+        return 1;
+    }
+    if (strstr(name, "wld_resource_island_01_b") != NULL) // Black Sand Atoll
+    {
+        return 2;
+    }
+    if (strstr(name, "wld_resource_island_02_b") != NULL) // Black Water Enclave
+    {
+        return 3;
+    }
+    if (strstr(name, "wld_resource_island_01_d") != NULL) // Blind Man's Lagoon
+    {
+        return 4;
+    }
+    if (strstr(name, "wsp_resource_island_01_f") != NULL) // Booty Isle
+    {
+        return 5;
+    }
+    if (strstr(name, "bsp_resource_island_01_a") != NULL) // Boulder Cay
+    {
+        return 6;
+    }
+    if (strstr(name, "dvr_resource_island_01_h") != NULL) // Brimstone Rock
+    {
+        return 7;
+    }
+    if (strstr(name, "wsp_resource_island_01_c") != NULL) // Castaway Isle
+    {
+        return 8;
+    }
+    if (strstr(name, "wsp_resource_island_01_a") != NULL) // Chicken Isle
+    {
+        return 9;
+    }
+    if (strstr(name, "dvr_resource_island_01_c") != NULL) // Cinder Islet
+    {
+        return 10;
+    }
+    if (strstr(name, "dvr_resource_island_01_b") != NULL) // Cursewater Shores
+    {
+        return 11;
+    }
+    if (strstr(name, "wsp_resource_island_01_e") != NULL) // Cutlass Cay
+    {
+        return 12;
+    }
+    if (strstr(name, "dvr_resource_island_01_g") != NULL) // Flame's End
+    {
+        return 13;
+    }
+    if (strstr(name, "wsp_resource_island_01_b") != NULL) // Fools Lagoon
+    {
+        return 14;
+    }
+    if (strstr(name, "dvr_resource_island_01_e") != NULL) // Glowstone Cay
+    {
+        return 15;
+    }
+    if (strstr(name, "wld_resource_island_02_c") != NULL) // Isle of Last Words
+    {
+        return 16;
+    }
+    if (strstr(name, "bsp_resource_island_02_f") != NULL) // Lagoon of Whispers
+    {
+        return 17;
+    }
+    if (strstr(name, "wld_resource_island_01_k") != NULL) // Liar's Backbone
+    {
+        return 18;
+    }
+    if (strstr(name, "bsp_resource_island_02_c") != NULL) // Lonely Isle
+    {
+        return 19;
+    }
+    if (strstr(name, "wsp_resource_island_02_a") != NULL) // Lookout Point
+    {
+        return 20;
+    }
+    if (strstr(name, "dvr_resource_island_01_i") != NULL) // Magma's Tide
+    {
+        return 21;
+    }
+    if (strstr(name, "wsp_resource_island_02_f") != NULL) // Mutineer Rock
+    {
+        return 22;
+    }
+    if (strstr(name, "wsp_resource_island_01_g") != NULL) // Old Salts Atoll
+    {
+        return 23;
+    }
+    if (strstr(name, "wsp_resource_island_01_d") != NULL) // Paradise Spring
+    {
+        return 24;
+    }
+    if (strstr(name, "bsp_resource_island_01_i") != NULL) // Picaroon Palms
+    {
+        return 25;
+    }
+    if (strstr(name, "wld_resource_island_01_c") != NULL) // Plunderer's Plight
+    {
+        return 26;
+    }
+    if (strstr(name, "bsp_resource_island_02_d") != NULL) // Rapier Cay
+    {
+        return 27;
+    }
+    if (strstr(name, "dvr_resource_island_01_f") != NULL) // Roaring Sands
+    {
+        return 28;
+    }
+    if (strstr(name, "bsp_resource_island_02_a") != NULL) // Rum Runner Isle
+    {
+        return 29;
+    }
+    if (strstr(name, "bsp_resource_island_01_b") != NULL) // Salty Sands
+    {
+        return 30;
+    }
+    if (strstr(name, "bsp_resource_island_02_b") != NULL) // Sandy Shallows
+    {
+        return 31;
+    }
+    if (strstr(name, "dvr_resource_island_01_a") != NULL) // Schored Pass
+    {
+        return 32;
+    }
+    if (strstr(name, "wld_resource_island_01_j") != NULL) // Scurvy Isley
+    {
+        return 33;
+    }
+    if (strstr(name, "bsp_resource_island_02_e") != NULL) // Sea Dog's Rest
+    {
+        return 34;
+    }
+    if (strstr(name, "wld_resource_island_01_h") != NULL) // Shark Tooth Key
+    {
+        return 35;
+    }
+    if (strstr(name, "wld_resource_island_02_e") != NULL) // Shiver Retreat
+    {
+        return 36;
+    }
+    if (strstr(name, "dvr_resource_island_01_d") != NULL) // The Forsaken Brink
+    {
+        return 37;
+    }
+    if (strstr(name, "wld_feature_tribute_peak") != NULL) // Tribute Peak
+    {
+        return 38;
+    }
+    if (strstr(name, "wld_resource_island_02_d") != NULL) // Tri-Rock Isle
+    {
+        return 39;
+    }
+    if (strstr(name, "bsp_resource_island_01_e") != NULL) // Twin Groves
+    {
+        return 40;
+    }
+    if (strstr(name, "dvr_feature_island_01_e") != NULL) // Ashen Reaches
+    {
+        return 41;
+    }
+    if (strstr(name, "bsp_feature_crescent_cove") != NULL) // Cannon Cove
+    {
+        return 42;
+    }
+    if (strstr(name, "bsp_feature_crescent_island") != NULL) // Crescent Isle
+    {
+        return 43;
+    }
+    if (strstr(name, "wsp_feature_crooks_hollow") != NULL) // Crook's Hollow
+    {
+        return 44;
+    }
+    if (strstr(name, "wsp_feature_devils_ridge") != NULL) // Devil's Ridge
+    {
+        return 45;
+    }
+    if (strstr(name, "wsp_feature_discovery_ridge") != NULL) // Discovery Ridge
+    {
+        return 46;
+    }
+    if (strstr(name, "dvr_feature_island_01_a") != NULL) // Fetcher's Rest
+    {
+        return 47;
+    }
+    if (strstr(name, "dvr_feature_island_01_b") != NULL) // Flintlock Peninsula
+    {
+        return 48;
+    }
+    if (strstr(name, "wld_feature_dragons_breath") != NULL) // Kraken's Fall
+    {
+        return 49;
+    }
+    if (strstr(name, "bsp_feature_lone_cove") != NULL) // Lone Cove
+    {
+        return 50;
+    }
+    if (strstr(name, "wld_feature_arches") != NULL) // Marauder's Arch
+    {
+        return 51;
+    }
+    if (strstr(name, "bsp_feature_mermaids_hideaway") != NULL) // Mermaid's Hideaway
+    {
+        return 52;
+    }
+    if (strstr(name, "wld_feature_old_faithful") != NULL) // Old Faithful Isle
+    {
+        return 53;
+    }
+    if (strstr(name, "wsp_feature_plunder_valley") != NULL) // Plunder Valley
+    {
+        return 54;
+    }
+    if (strstr(name, "dvr_feature_island_01_c") != NULL) // Ruby's Fall
+    {
+        return 55;
+    }
+    if (strstr(name, "bsp_feature_sailors_bounty") != NULL) // Sailor's Bounty
+    {
+        return 56;
+    }
+    if (strstr(name, "wsp_feature_sharkbait_cove") != NULL) // Shark Bait Cove
+    {
+        return 57;
+    }
+    if (strstr(name, "wld_feature_shipwreck_bay") != NULL) // Shipwreck Bay
+    {
+        return 58;
+    }
+    if (strstr(name, "bsp_feature_smugglers_bay") != NULL) // Smugglers' Bay
+    {
+        return 59;
+    }
+    if (strstr(name, "wsp_feature_snake_island") != NULL) // Snake Island
+    {
+        return 60;
+    }
+    if (strstr(name, "wld_feature_three_peaks") != NULL) // The Crooked Masts
+    {
+        return 61;
+    }
+    if (strstr(name, "dvr_feature_island_01_d") != NULL) // The Devil's Thirst
+    {
+        return 62;
+    }
+    if (strstr(name, "wld_feature_cavern_isle") != NULL) // The Sunken Grove
+    {
+        return 63;
+    }
+    if (strstr(name, "wsp_feature_thieves_haven") != NULL) // Thieves' Haven
+    {
+        return 64;
+    }
+    if (strstr(name, "bsp_feature_wanderers_archipelago") != NULL) // Wanderers Refuge
+    {
+        return 65;
+    }
+    return 0;
+}
+
+std::string getIslandNameByCode(int code)
+{
+    switch (code)
+    {
+    case 1: return "BarnaCle Cay";
+    case 2: return "Black Sand Atoll";
+    case 3: return "Black Water Enclave";
+    case 4: return "Blind Man's Lagoon";
+    case 5: return "Booty Isle";
+    case 6: return "Boulder Cay";
+    case 7: return "Brimstone Rock";
+    case 8: return "Castaway Isle";
+    case 9: return "Chicken Isle";
+    case 10:return "Cinder Islet";
+    case 11:return "Cursewater Shores";
+    case 12:return "Cutlass Cay";
+    case 13:return "Flame's End";
+    case 14:return "Fools Lagoon";
+    case 15:return "Glowstone Cay";
+    case 16:return "Isle of Last Words";
+    case 17:return "Lagoon of Whispers";
+    case 18:return "Liar's Backbone";
+    case 19:return "Lonely Isle";
+    case 20:return "Lookout Point";
+    case 21:return "Magma's Tide";
+    case 22:return "Mutineer Rock";
+    case 23:return "Old Salts Atoll";
+    case 24:return "Paradise Spring";
+    case 25:return "Picaroon Palms";
+    case 26:return "Plunderer's Plight";
+    case 27:return "Rapier Cay";
+    case 28:return "Roaring Sands";
+    case 29:return "Rum Runner Isle";
+    case 30:return "Salty Sands";
+    case 31:return "Sandy Shallows";
+    case 32:return "Schored Pass";
+    case 33:return "Scurvy Isley";
+    case 34:return "Sea Dog's Rest";
+    case 35:return "Shark Tooth Key";
+    case 36:return "Shiver Retreat";
+    case 37:return "The Forsaken Brink";
+    case 38:return "Tribute Peak";
+    case 39:return "Tri-Rock Isle";
+    case 40:return "Twin Groves";
+    case 41:return "Ashen Reaches";
+    case 42:return "Cannon Cove";
+    case 43:return "Crescent Isle";
+    case 44:return "Crook's Hollow";
+    case 45:return "Devil's Ridge";
+    case 46:return "Discovery Ridge";
+    case 47:return "Fetcher's Rest";
+    case 48:return "Flintlock Peninsula";
+    case 49:return "Kraken's Fall";
+    case 50:return "Lone Cove";
+    case 51:return "Marauder's Arch";
+    case 52:return "Mermaid's Hideaway";
+    case 53:return "Old Faithful Isle";
+    case 54:return "Plunder Valley";
+    case 55:return "Ruby's Fall";
+    case 56:return "Sailor's Bounty";
+    case 57:return "Shark Bait Cove";
+    case 58:return "Shipwreck Bay";
+    case 59:return "Smugglers' Bay";
+    case 60:return "Snake Island";
+    case 61:return "The Crooked Masts";
+    case 62:return "The Devil's Thirst";
+    case 63:return "The Sunken Grove";
+    case 64:return "Thieves' Haven";
+    case 65:return "Wanderers Refuge";
+    default:return "No Island Data";
+    }
+}
+
+
+
 uintptr_t milliseconds_now() {
     static LARGE_INTEGER s_frequency;
     static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
@@ -72,6 +473,30 @@ void fn()
     randomnumber = randomNum; // Changes the value of randomnumber to the value of randomNum
     return; // disables the function because you should call it inside of a loop
 }
+
+FVector pickHoleToAim(AHullDamage* damage, const FVector& localLoc)
+{
+    FVector fLocation = { 0.f, 0.f, 9999.f };
+    FVector location = FVector();
+    float currentDist = 55000.f;
+    const auto holes = damage->DamageZones;
+    for (auto h = 0u; h < holes.Count; h++)
+    {
+        auto const hole = holes[h];
+        if (hole->DamageLevel < 3)
+        {
+            location = FVector(reinterpret_cast<ACharacter*>(hole)->K2_GetActorLocation());
+            float dist = localLoc.DistTo(location);
+            if (dist <= currentDist)
+            {
+                currentDist = dist;
+                fLocation = location;
+            }
+        }
+    }
+    return fLocation;
+}
+
 
 #define STEAM
 //#define LOGFILE
@@ -657,6 +1082,8 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
             const auto cameraLoc = camera->GetCameraLocation();
             const auto cameraRot = camera->GetCameraRotation();
 
+            int XMarksMapCount = 1;
+
             auto const localCharacter = localController->Character;
             if (!localCharacter) break;
 
@@ -882,47 +1309,29 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                 {
                     if (cfg.visuals.islands.bName)
                     {
-                        do
+                        const auto entries = AthenaGameViewportClient->World->GameState->IslandService->IslandDataAsset->IslandDataEntries;
+                        for (auto i = 0u; i < entries.Count; i++)
                         {
-                            auto const islandService = gameState->IslandService;
-                            if (!islandService) break;
-
-                            auto const islandDataAsset = islandService->IslandDataAsset;
-                            if (!islandDataAsset) break;
-
-                            auto const islandDataEntries = islandDataAsset->IslandDataEntries;
-                            if (!islandDataEntries.Data)break;
-
-                            for (auto i = 0u; i < islandDataEntries.Count; i++)
+                           
+                            auto const island = entries[i];
+                            auto const WorldMapData = island->WorldMapData;
+                            if (!WorldMapData) continue;
+                            const FVector islandLoc = WorldMapData->CaptureParams.WorldSpaceCameraPosition;
+                            const float dist =localLoc.DistTo(islandLoc) * 0.01f;
+                            if ((islandLoc.DistTo(FVector(0.f, 0.f, 0.f)) * 0.01) < 50.f) continue; // Conflictive Islands merging at 0.0.0 World Pos
+                            if (dist > cfg.visuals.islands.intMaxDist) continue;
+                            FVector2D screen;
+                            if (localController->ProjectWorldLocationToScreen(islandLoc, screen))
                             {
-
-                                auto const island = islandDataEntries[i];
-
-                                auto const WorldMapData = island->WorldMapData;
-
-                                if (!WorldMapData) continue;
-
-                                const FVector islandLoc = WorldMapData->WorldSpaceCameraPosition;
-                                const int dist = localLoc.DistTo(islandLoc) * 0.01f;
-                                if (dist > cfg.visuals.islands.intMaxDist) continue;
-                                FVector2D screen;
-                                if (localController->ProjectWorldLocationToScreen(islandLoc, screen))
-                                {
-                                    char buf[0x64];
-                                    auto len = island->LocalisedName->multi(buf, 0x50);
-                                    sprintf_s(buf + len, sizeof(buf) - len, " [%dm]", dist);
-                                    Drawing::RenderText(buf, screen, cfg.visuals.islands.textCol);
-
-                                }
+                                char buf[0x64];
+                                auto len = island->LocalisedName->multi(buf, 0x50);
+                                sprintf_s(buf + len, sizeof(buf) - len, " [%.0fm]", dist);
+                                Drawing::RenderText(buf, screen, cfg.visuals.islands.textCol);
                             }
-                        } while (false);
+                        }
                     }
                 }
-
-
-
-
-
+                
             }
 
             if (cfg.fishing.bEnable)
@@ -1021,8 +1430,8 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                         }
                     }
                 }
-            }
-
+            } 
+            
             if (cfg.misc.bEnable && !localCharacter->IsLoading())
             {
                 if (cfg.misc.client.bEnable)
@@ -1140,6 +1549,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     if (localController->IdleDisconnectEnabled && cfg.misc.macro.bIdleKick)
                     {
                         localController->IdleDisconnectEnabled = false;
+
                     }
                 }
 
@@ -1246,6 +1656,8 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     auto const actor = actors[a];
                     if (!actor) continue;
 
+
+                    
 
                     {
                         //if (actor->isShip())
@@ -1481,6 +1893,91 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 }
                             }
                         }
+                        
+                    /*if (cfg.misc.xmarks.bEnable && actor->isXMarkMap())
+                    {
+                        if (XMarksMapCount == 1 && item && item->isXMarkMap())
+                            Drawing::RenderText("Recognized Maps:", { io.DisplaySize.x * 0.85f, io.DisplaySize.y * 0.85f }, { 1.f, 1.f, 0.f, 1.f });
+                        auto map = reinterpret_cast<AXMarksTheSpotMap*>(actor);
+                        FString mapName = map->MapTexturePath;
+                        auto mapMarks = map->Marks;
+
+                        char cMapName[0x64];
+                        const int len = mapName.multi(cMapName, sizeof(cMapName));
+                        int mapCode = getMapNameCode(cMapName);
+
+                        
+
+                        //const auto islandDataEntries = gameState->IslandService->IslandDataAsset->IslandDataEntries;
+                        //const auto islandDataEntries = gameState->IslandService->IslandDataAsset->IslandDataEntries;
+                        const auto islandDataEntries = AthenaGameViewportClient->World->GameState->IslandService->IslandDataAsset->IslandDataEntries;
+
+                        try
+                        {
+                            float scaleFactor = 1.041669;
+
+                            for (auto i = 0u; i < islandDataEntries.Count; i++)
+                            {
+                                auto island = islandDataEntries[i];
+                                const char* sIslandName = island->IslandName.GetNameFast();
+                                char ccIsland[0x64];
+                                ZeroMemory(ccIsland, sizeof(ccIsland));
+                                sprintf_s(ccIsland, sizeof(ccIsland), sIslandName);
+
+                                int code = getMapNameCode(ccIsland);
+
+                                if (mapCode == code)
+                                {
+                                    std::string buf = getIslandNameByCode(mapCode);
+                                    if (item && item->isXMarkMap())
+                                        Drawing::RenderText(buf.c_str(), { io.DisplaySize.x * 0.85f, io.DisplaySize.y * 0.85f + 10 + 20 * XMarksMapCount }, { 0.f, 1.f, 0.f, 1.f });
+                                    XMarksMapCount++;
+
+                                    auto const WorldMapData = island->WorldMapData;
+                                    if (!WorldMapData) continue;
+
+                                    const FVector islandLoc = WorldMapData->CaptureParams.WorldSpaceCameraPosition;
+                                    auto islandOrtho = WorldMapData->CaptureParams.CameraOrthoWidth;
+
+
+                                    for (auto i = 0u; i < mapMarks.Count; i++)
+                                    {
+                                        auto mark = mapMarks[i];
+
+                                        FVector2D v = FVector2D(mark.Position);
+                                        FVector2D vectorRotated = RotatePoint(v, FVector2D(0.5f, 0.5f), 180 + map->Rotation, false);
+                                        FVector2D vectorAlligned = FVector2D(vectorRotated.X - 0.5f, vectorRotated.Y - 0.5f);
+
+                                        float islandScale = islandOrtho / scaleFactor;
+                                        FVector2D offsetPos = vectorAlligned * islandScale;
+
+
+                                        FVector digSpot = FVector(islandLoc.X - offsetPos.X, islandLoc.Y - offsetPos.Y, 0.f);
+
+                                        FHitResult hit_result;
+                                        auto start = FVector(digSpot.X, digSpot.Y, 5000.f);
+
+                                        bool res = raytrace(world, start, digSpot, &hit_result);
+                                        digSpot.Z = hit_result.ImpactPoint.Z;
+
+                                        FVector2D screen;
+                                        if (localController->ProjectWorldLocationToScreen(digSpot, screen))
+                                        {
+                                            char buf3[0x64];
+                                            const int dist = localLoc.DistTo(digSpot) * 0.01f;
+                                            //if (dist > cfg->esp.islands.marksRenderDistance) continue;
+                                            sprintf_s(buf3, sizeof(buf3), "X [%dm]", dist);
+                                            Drawing::RenderText(buf3, screen, cfg.visuals.islands.textCol);
+                                        }
+
+                                    }
+                                }
+
+                            }
+                        }
+                        catch (...) {
+                        }
+                    }*/
 
                         if (cfg.visuals.items.bEnable)
                         {
@@ -1517,6 +2014,52 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                         char buf[0x64];
                                         sprintf(buf, "B");
                                         Drawing::RenderText(buf, screen, cfg.visuals.items.barreltextCol);
+
+
+                                        AStorageContainer* barrel = (AStorageContainer*)actor;
+                                       
+
+
+                                        if (barrel->StorageContainer)
+                                        {
+                                            auto cNodes = barrel->StorageContainer->ContainerNodes.ContainerNodes;
+                                            for (unsigned int k = 0; k < cNodes.Count; k++)
+                                            {
+                                                FStorageContainerNode node = cNodes[k];
+
+                                                if (node.ItemDesc)
+                                                {
+                                                    UItemDescEx* itemDesc = node.ItemDesc->CreateDefaultObject<UItemDescEx>();
+
+                                                    if (itemDesc)
+                                                    {
+                                                        char buf2[0x50];
+                                                        ZeroMemory(buf2, sizeof(buf2));
+
+
+                                                        //FString itemName = itemDesc->Description.TextData->Text;
+                                                        std::string itemName2 = getShortName(itemDesc->GetName());
+
+
+                                                        int len = snprintf(buf2, sizeof(buf2), itemName2.c_str());
+                                                        snprintf(buf2 + len, sizeof(buf2) - len, " [%d]", node.NumItems);
+
+
+                                                        screen.Y += 20;
+
+                                                        if (cfg.misc.others.barrelstoggle)
+                                                        {
+                                                            if (GetAsyncKeyState(0x52)) // R Key 
+                                                                Drawing::RenderText(buf2, screen, cfg.visuals.items.barreltextCol);
+                                                        }
+                                                        else
+                                                        {
+                                                            Drawing::RenderText(buf2, screen, cfg.visuals.items.barreltextCol);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -1636,22 +2179,25 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                     const int dist = localLoc.DistTo(location) * 0.01f;
 
                                     if (dist > cfg.visuals.storm.drawdistance) continue;
-                                    if (localController->ProjectWorldLocationToScreen(location, screen))
+                                    if (location != NULL)
                                     {
-
-
-                                   
-                                        
-                                        char buf[0x64];
-                                        sprintf(buf, "Storm [%dm]", dist);
+                                        if (localController->ProjectWorldLocationToScreen(location, screen))
+                                        {
 
 
 
 
-                                        Drawing::RenderText(buf,  screen , cfg.visuals.storm.textCol);
-                                        
+                                            char buf[0x64];
+                                            sprintf(buf, "Storm [%dm]", dist);
 
-                                        
+
+
+
+                                            Drawing::RenderText(buf, screen, cfg.visuals.storm.textCol);
+
+
+
+                                        }
                                     }
                                 }
                             }
@@ -2055,13 +2601,16 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                             {
                                 const FVector location = reinterpret_cast<ACharacter*>(vault->OuterDoor)->K2_GetActorLocation();
                                 FVector2D screen;
-                                if (localController->ProjectWorldLocationToScreen(location, screen)) 
+                                if (location != NULL)
                                 {
-                                    char buf[0x64];
-                                    const int dist = localLoc.DistTo(location) * 0.01f;
-                                    if (dist > cfg.visuals.puzzles.drawdistance) continue;
-                                    sprintf(buf, "Vault Door [%dm]", dist);
-                                    Drawing::RenderText(buf, screen, cfg.visuals.puzzles.textCol);
+                                    if (localController->ProjectWorldLocationToScreen(location, screen))
+                                    {
+                                        char buf[0x64];
+                                        const int dist = localLoc.DistTo(location) * 0.01f;
+                                        if (dist > cfg.visuals.puzzles.drawdistance) continue;
+                                        sprintf(buf, "Vault Door [%dm]", dist);
+                                        Drawing::RenderText(buf, screen, cfg.visuals.puzzles.textCol);
+                                    }
                                 }
                             }
                         }
@@ -2069,7 +2618,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
 
 
 
-                    }
+                }
 
                     if (cfg.misc.client.b_map_pins)
                     {
@@ -2099,35 +2648,58 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                     }
                                 }
                             }
+
                         }
                     }
-
-                   /* if (cfg.misc.client.b_cooking_timer)
+                    if (cfg.misc.others.b_ship_pins)
                     {
-                        if (actor->isCookingPot())
+                        if (actor->isMapTable())
                         {
                             if (localCharacter->GetCurrentShip() == actor->GetParentActor())
                             {
-                                auto pot = reinterpret_cast<ACookingPot*>(actor);
-                            }
-                        }
-                        /*auto pot = reinterpret_cast<ACookingPot*>(actor);
-                        auto cook = pot->CookerComponent->CurrentlyCookingItem;
+                                auto maptable = reinterpret_cast<AMapTable*>(actor);
+                                auto tracked_ships = maptable->TrackedShips;
+                                for (auto s = 0u; s < tracked_ships.Count; s++)
+                                {
+                                        FWorldMapShipLocation current_ship = tracked_ships[s];
+                                        //FVector2D current_map_pin = map_pins[i];
 
-                        if (pot->CookerComponent->CurrentlyCookingItem)
-                        {
-                            std::wstring cooking_name = pot->CookerComponent->CurrentlyCookingItem->Desc->Title->wide();
-                            //auto const desc = cook->GetItemInfo()->Desc;
-                            if (L"Fish" == cooking_name)
-                            {
-                                char buf[0xFF];
-                                FVector2D pos{ 1.f, 45.f };
-                                ImVec4 col{ 1.f,1.f,1.f,1.f };
-                                pos.Y += 20.f;
-                                Drawing::RenderText("Fish", pos, col, true, false);
+                                        //current_ship.Location *= 100.f;
+                                        FVector current_ship_pin_world;
+                                        current_ship_pin_world.X = current_ship.Location.X;
+                                        current_ship_pin_world.Y = current_ship.Location.Y;
+                                        current_ship_pin_world.Z = 0.f;
+
+                                        FVector2D screen;
+                                        if (localController->ProjectWorldLocationToScreen(current_ship_pin_world, screen))
+                                        {
+                                            const int dist = localLoc.DistTo(current_ship_pin_world) * 0.01f;
+                                            //const int reaperslevel = current_ship.ReapersMarkLevel;
+                                            //const int asd = current_ship.EmissaryLevel;
+                                           // std::string name = std::string(current_ship.OwnerFactionName.GetName());
+                                           // std::string faction_name;
+                                            //FACTIONB = REAPER
+                                           // std::wstring nameW = std::wstring(nameW.begin(), nameW.end());
+                                            char buf[0x64];
+                                            /*if (type.find("BP_Small") != std::string::npos)
+                                                sprintf(buf, "Sloop\n(%d%% Water)\n[%dm] [%.0fm/s]", amount, dist, speed);
+                                            else if (type.find("BP_Medium") != std::string::npos)
+                                                sprintf(buf, "Brig (%d%% Water) [%dm] [%.0fm/s]", amount, dist, speed);
+                                            if (current_ship.ReapersMarkLevel == 0)*/
+                                            if (dist > 3500.f)
+                                                snprintf(buf, sizeof(buf), "Ship [%dm]", dist);
+                                           /* else if (dist < 3500.f && asd != 0)
+                                                snprintf(buf, sizeof(buf), "[Reaper: %d]", asd);
+                                            else if (dist > 3500.f && asd == 0)
+                                                snprintf(buf, sizeof(buf), "Ship [%dm]", dist);*/
+                                                
+                                            Drawing::RenderText(buf, { screen.X, screen.Y - 8 }, cfg.visuals.ships.textCol, true, true);
+                                        }
+                                }
                             }
+
                         }
-                    }*/
+                    }
 
                     if (cfg.misc.client.b_cooking_timer)
                     {
@@ -2485,19 +3057,23 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                         const FVector forward = actor->GetActorForwardVector();
                                         const FVector up = actor->GetActorUpVector();
                                         const FVector loc = actor->K2_GetActorLocation();
-
                                         FVector loc_mast = loc;
-
-                                        //FIND FLOOR LOCATION
                                         loc_mast += forward * 52.f;
                                         loc_mast += up * 275.f;
-
                                         location = loc_mast;
-
                                         gravity_scale = 1.30f;
                                     }
-
-                                    if (cfg.aim.cannon.randomshots)
+                                    else if (cfg.aim.cannon.lowAim)
+                                    {
+                                        auto const damage = actor->GetHullDamage();
+                                        if (damage)
+                                        {
+                                            FVector loc = pickHoleToAim(damage, localLoc);
+                                            if (loc.Sum() != 9999.f)
+                                                location = loc;
+                                        }
+                                    }
+                                    else if (cfg.aim.cannon.randomshots)
                                     {
                                             static std::uintptr_t desiredTime = 0; // Delaying it like this because I'm running the whole cheat inside of a loop (using sleep will cause everything to pause)
                                             if (milliseconds_now() >= desiredTime)
@@ -3735,6 +4311,7 @@ void Cheat::Renderer::renderSubTab0() {
         ImGui::Checkbox("Aim At Players", &cfg.aim.cannon.playeraimbot);
         ImGui::Checkbox("Aim At Skeletons", &cfg.aim.cannon.skeletonaimbot);
         ImGui::Checkbox("Random Holes", &cfg.aim.cannon.randomshots);
+        ImGui::Checkbox("Hole Logic", &cfg.aim.cannon.lowAim);
         ImGui::Checkbox("Deckshots", &cfg.aim.cannon.deckshots);
         ImGui::SliderFloat("Yaw", &cfg.aim.cannon.fYaw, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
         ImGui::SliderFloat("Pitch", &cfg.aim.cannon.fPitch, 1.f, 100.f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
@@ -3851,6 +4428,7 @@ void Cheat::Renderer::renderSubTab1() {
         ImGui::Checkbox("Draw Name", &cfg.visuals.items.bName);
         ImGui::Checkbox("Barrels", &cfg.visuals.items.barrelitems);
         ImGui::Checkbox("Ammo Chests", &cfg.visuals.items.ammochests);
+        ImGui::Checkbox("Barrelpeek", &cfg.misc.others.barrelstoggle);
         ImGui::ColorEdit4("Text ", &cfg.visuals.items.textCol.x, 0); ImGui::SameLine();
         ImGui::ColorEdit4("Barrel Text ", &cfg.visuals.items.barreltextCol.x, 0); ImGui::SameLine();
         ImGui::ColorEdit4("Ammo Chest ", &cfg.visuals.items.ammotextCol.x, 0);
@@ -4056,10 +4634,14 @@ void Cheat::Renderer::renderSubTab2() {
     }
     case 2: {
         ImGui::Text("Players List");
-        ImGui::BeginChild("Players List", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::BeginChild("Players List", ImVec2(ImGuiHelper::getWidth(), 400), true);
         ImGui::Checkbox("Enable", &cfg.misc.game.bEnable);
         ImGui::Checkbox("Show Players List", &cfg.misc.game.bShowPlayers);
         ImGui::EndChild();
+
+        ImGui::Text("XMarks");
+        ImGui::BeginChild("XMarks", ImVec2(ImGuiHelper::getWidth(), ImGuiHelper::getHeight()), true);
+        ImGui::Checkbox("Enable", &cfg.misc.xmarks.bEnable);
         break;
     }
     }
@@ -4326,6 +4908,7 @@ inline bool Cheat::Tools::FindWorld()
 
 inline bool Cheat::Tools::InitSDK()
 {
+    AthenaGameViewportClient = UObject::FindObject<UAthenaGameViewportClient>("AthenaGameViewportClient Transient.AthenaGameEngine_1.AthenaGameViewportClient_1");
     if (!UCrewFunctions::Init()) return false;
     if (!UKismetMathLibrary::Init()) return false;
     return true;

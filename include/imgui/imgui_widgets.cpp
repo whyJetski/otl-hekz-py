@@ -33,6 +33,7 @@ Index of this file:
 #endif
 
 #include "imgui.h"
+#include <WinUser.h>
 #ifndef IMGUI_DISABLE
 
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
@@ -1091,6 +1092,8 @@ bool ImGui::ImageButton(ImTextureID user_texture_id, const ImVec2& size, const I
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, window->DC.ItemFlags | ImGuiItemStatusFlags_Checkable | (*v ? ImGuiItemStatusFlags_Checked : 0));
     return pressed;
 }*/
+
+
 
 bool ImGui::Checkbox(const char* label, bool* v)
 {

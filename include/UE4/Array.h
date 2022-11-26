@@ -11,6 +11,10 @@ public:
 	T& operator[](int i) const { return Data[i];};
 
 	T* Data;
+	inline int Num() const
+	{
+		return Count;
+	};
 	unsigned int Count;
 	unsigned int Max;
 };
