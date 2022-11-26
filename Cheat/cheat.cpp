@@ -24,11 +24,11 @@ std::string getShortName(std::string name)
     if (name.find("cannon_ball") != std::string::npos)
         return "Cannon Ball";
     if (name.find("cannonball_chain_shot") != std::string::npos)
-        return "Cannon Chain";
+        return "Chainshot";
     if (name.find("cannonball_Grenade") != std::string::npos)
-        return "Dispersion Ball";
+        return "Blunderbomb";
     if (name.find("cannonball_cur_fire") != std::string::npos)
-        return "Fire Ball";
+        return "Firebomb";
     if (name.find("cannonball_cur") != std::string::npos)
         return "Cursed Cannon Ball";
 
@@ -36,7 +36,7 @@ std::string getShortName(std::string name)
         return "Wood";
 
     if (name.find("PomegranateFresh") != std::string::npos)
-        return "Granate";
+        return "Pomegranate";
     if (name.find("CoconutFresh") != std::string::npos)
         return "Coconut";
     if (name.find("BananaFresh") != std::string::npos)
@@ -1989,6 +1989,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 {
                                     const int dist = localLoc.DistTo(location) * 0.01f;
                                     if (dist > cfg.visuals.items.itemdrawdistance) continue;
+                                    if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52) && localCharacter->GetCurrentShip() != NULL) continue;
                                     if (localController->ProjectWorldLocationToScreen(location, screen))
                                     {
                                         auto const desc = actor->GetItemInfo()->Desc;
@@ -2009,6 +2010,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 {
                                     const int dist = localLoc.DistTo(location) * 0.01f;
                                     if (dist > cfg.visuals.items.barreldrawdistance) continue;
+                                    if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52) && localCharacter->GetCurrentShip() != NULL) continue;
                                     if (localController->ProjectWorldLocationToScreen(location, screen))
                                     {
                                         char buf[0x64];
