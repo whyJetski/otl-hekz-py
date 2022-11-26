@@ -801,7 +801,6 @@ struct FHitResult
 	unsigned char                                      UnknownData00[0x3];                                       // 0x0001(0x0003) MISSED OFFSET
 	float                                              Time;                                                     // 0x0004(0x0004) (ZeroConstructor, IsPlainOldData)
 	float                                              Distance;                                                 // 0x0008(0x0004) (ZeroConstructor, IsPlainOldData)
-	struct FVector_NetQuantize                         ImpactPoint;                                              // 0x0018(0x000C)
 	char pad_5894[0x48];
 	float                                              PenetrationDepth;                                         // 0x0054(0x0004) (ZeroConstructor, IsPlainOldData)
 	int                                                Item;                                                     // 0x0058(0x0004) (ZeroConstructor, IsPlainOldData)
