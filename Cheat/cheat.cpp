@@ -532,12 +532,15 @@ void Cheat::Hacks::ProcessEventHook(void* obj, UFunction* function, void* parms)
         if (result->ContentsType->GetFullName().find("ScriptStruct Athena.TakeItemFromContainerRPC") != std::string::npos)
         {
             Logger::Log("asd\n");
+            //Logger::Log("%c", result->ContentsType);
            // return;
         }
-        if (result->ContentsType->GetFullName().find("ScriptStruct Athena.ProjectileWeaponFireInaccuracySeedMismatchTelemetryEvent") != std::string::npos)
+        if (result->ContentsType->GetFullName().find("ScriptStruct Athena.BoxedRpcShipStockOffersPurchased") != std::string::npos)
         {
-            Logger::Log("asd\n");
-            //return;
+            Logger::Log("asd2\n");
+            //Logger::Log("%d\n");
+           // return;
+
         }
     }
 
@@ -574,14 +577,15 @@ void Cheat::Hacks::Init()
     //Logger::Log("AddPitchInput: 0x%llX\n", fn->Func);
 
 
-    /*UClass* klass = UObject::FindObject<UClass>("Class Athena.ProjectileWeapon");
+   /* UClass* klass = UObject::FindObject<UClass>("Class Athena.ProjectileWeapon");
     Logger::Log("Class Athena.ProjectileWeapon: 0x%llX\n", klass);
     void* vtable_raw = klass->Vtable;
     Logger::Log("Vtable: 0x%llX\n", vtable_raw);
     UINT64* vtable_uint64 = (UINT64*)vtable_raw;
     Logger::Log("ProcessEvent: 0x%llX\n", vtable_uint64[55]);
-    SetHook((void*)0x7FF728508410, ProcessEventHook, reinterpret_cast<void**>(&ProcessEventOriginal));
-    */
+    //SetHook((void*)0x7FF6ACA1F6D0, ProcessEventHook, reinterpret_cast<void**>(&ProcessEventOriginal));
+    SetHook((void*)vtable_uint64[55], ProcessEventHook, reinterpret_cast<void**>(&ProcessEventOriginal));*/
+    
 
 }
 
@@ -589,7 +593,7 @@ inline void Cheat::Hacks::Remove()
 {
     //RemoveHook(CanFireOriginal);
    //RemoveHook(OnWeaponFiredOriginal);
-   // RemoveHook(ProcessEventOriginal);
+   //RemoveHook(ProcessEventOriginal);
 }
 
 void Cheat::Renderer::Drawing::RenderText(const char* text, const FVector2D& pos, const ImVec4& color, const bool outlined = false, const bool centered = true)
@@ -1551,6 +1555,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                         localController->IdleDisconnectEnabled = false;
 
                     }
+
                 }
 
                 if (cfg.misc.game.bEnable)
@@ -1657,7 +1662,6 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     if (!actor) continue;
 
 
-                    
 
                     {
                         //if (actor->isShip())
@@ -1989,7 +1993,11 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 {
                                     const int dist = localLoc.DistTo(location) * 0.01f;
                                     if (dist > cfg.visuals.items.itemdrawdistance) continue;
-                                    if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52) && localCharacter->GetCurrentShip() != NULL) continue;
+                                    auto ship = localCharacter->GetCurrentShip();
+                                    if (ship)
+                                    {
+                                        if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52)) continue;
+                                    }
                                     if (localController->ProjectWorldLocationToScreen(location, screen))
                                     {
                                         auto const desc = actor->GetItemInfo()->Desc;
@@ -2010,7 +2018,11 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 {
                                     const int dist = localLoc.DistTo(location) * 0.01f;
                                     if (dist > cfg.visuals.items.barreldrawdistance) continue;
-                                    if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52) && localCharacter->GetCurrentShip() != NULL) continue;
+                                    auto ship = localCharacter->GetCurrentShip();
+                                    if (ship)
+                                    {
+                                        if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52)) continue;
+                                    }
                                     if (localController->ProjectWorldLocationToScreen(location, screen))
                                     {
                                         char buf[0x64];
@@ -4899,6 +4911,7 @@ inline bool Cheat::Tools::FindWorld()
 inline bool Cheat::Tools::InitSDK()
 {
     AthenaGameViewportClient = UObject::FindObject<UAthenaGameViewportClient>("AthenaGameViewportClient Transient.AthenaGameEngine_1.AthenaGameViewportClient_1");
+    //LightingController = UObject::FindObject<ALightingController>("Class Athena.LightingController");
     if (!UCrewFunctions::Init()) return false;
     if (!UKismetMathLibrary::Init()) return false;
     return true;

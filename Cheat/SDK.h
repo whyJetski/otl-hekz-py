@@ -2975,8 +2975,86 @@ struct FThrowGrenadeRpc : FBoxedRpc {
 	struct FVector LocalWielderVelocity; // 0x2c(0x0c)
 };
 
+struct UExponentialHeightFogComponent {
+	char pad[0x2e0];
+	float FogDensity; // 0x2e0(0x04)
+	struct FLinearColor FogInscatteringColor; // 0x2e4(0x10)
+	struct FLinearColor FarFogInscatteringColor; // 0x2f4(0x10)
+	float DirectionalInscatteringExponent; // 0x304(0x04)
+	float DirectionalInscatteringStartDistance; // 0x308(0x04)
+	float StartScaleDirectionalInscattering; // 0x30c(0x04)
+	float FarScaleDirectionalInscattering; // 0x310(0x04)
+	struct FLinearColor DirectionalInscatteringColor; // 0x314(0x10)
+	float FogHeightFalloff; // 0x324(0x04)
+	float FogMaxOpacity; // 0x328(0x04)
+	float StartDistance; // 0x32c(0x04)
+	float FarDistance; // 0x330(0x04)
+	float StartScale; // 0x334(0x04)
+	float FarScale; // 0x338(0x04)
+	bool bIsUnderwater; // 0x33c(0x01)
+	char UnknownData_33D[0x3]; // 0x33d(0x03)
+
+	void SetStartDistance(float Value); // Function Engine.ExponentialHeightFogComponent.SetStartDistance // Final|Native|Public|BlueprintCallable // @ game+0x2e024b0
+	void SetInscatteringStartScale(float Value); // Function Engine.ExponentialHeightFogComponent.SetInscatteringStartScale // Final|Native|Public|BlueprintCallable // @ game+0x2e00380
+	void SetInscatteringFarScale(float Value); // Function Engine.ExponentialHeightFogComponent.SetInscatteringFarScale // Final|Native|Public|BlueprintCallable // @ game+0x2e00300
+	void SetFogMaxOpacity(float Value); // Function Engine.ExponentialHeightFogComponent.SetFogMaxOpacity // Final|Native|Public|BlueprintCallable // @ game+0x2dffab0
+	void SetFogInscatteringColor(struct FLinearColor Value); // Function Engine.ExponentialHeightFogComponent.SetFogInscatteringColor // Final|Native|Public|HasDefaults|BlueprintCallable // @ game+0x2dffa30
+	void SetFogHeightFalloff(float Value); // Function Engine.ExponentialHeightFogComponent.SetFogHeightFalloff // Final|Native|Public|BlueprintCallable // @ game+0x2dff9b0
+	void SetFogDensity(float Value) // Function Engine.ExponentialHeightFogComponent.SetFogDensity // Final|Native|Public|BlueprintCallable // @ game+0x2dff930 // Function Athena.FishingRod.Multicast_RemoveFishFromLine // Final|Net|Native|Event|NetMulticast|Private // @ game+0x3d90800
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.ExponentialHeightFogComponent.SetFogDensity");
+		struct {
+			float Value;
+		} params;
+		params.Value = Value;
+		ProcessEvent(this, fn, &params);
+	}
+	void SetFarInscatteringColour(struct FLinearColor Value); // Function Engine.ExponentialHeightFogComponent.SetFarInscatteringColour // Final|Native|Public|HasDefaults|BlueprintCallable // @ game+0x2dff640
+	void SetExponentialFogFarDistance(float Value); // Function Engine.ExponentialHeightFogComponent.SetExponentialFogFarDistance // Final|Native|Public|BlueprintCallable // @ game+0x2dff540
+	void SetDirectionalInscatteringStartScale(float Value); // Function Engine.ExponentialHeightFogComponent.SetDirectionalInscatteringStartScale // Final|Native|Public|BlueprintCallable // @ game+0x2dfeda0
+	void SetDirectionalInscatteringStartDistance(float Value); // Function Engine.ExponentialHeightFogComponent.SetDirectionalInscatteringStartDistance // Final|Native|Public|BlueprintCallable // @ game+0x2dfed20
+	void SetDirectionalInscatteringFarScale(float Value); // Function Engine.ExponentialHeightFogComponent.SetDirectionalInscatteringFarScale // Final|Native|Public|BlueprintCallable // @ game+0x2dfeca0
+	void SetDirectionalInscatteringExponent(float Value); // Function Engine.ExponentialHeightFogComponent.SetDirectionalInscatteringExponent // Final|Native|Public|BlueprintCallable // @ game+0x2dfec20
+	void SetDirectionalInscatteringColor(struct FLinearColor Value); // Function Engine.ExponentialHeightFogComponent.SetDirectionalInscatteringColor // Final|Native|Public|HasDefaults|BlueprintCallable // @ game+0x2dfeba0
+	void SetVisibility(bool Value) // Function Engine.ExponentialHeightFogComponent.SetFogDensity // Final|Native|Public|BlueprintCallable // @ game+0x2dff930 // Function Athena.FishingRod.Multicast_RemoveFishFromLine // Final|Net|Native|Event|NetMulticast|Private // @ game+0x3d90800
+	{
+		static auto fn = UObject::FindObject<UFunction>("Function Engine.ExponentialHeightFogComponent.SetVisibility");
+		struct {
+			bool Value = true;
+		} params;
+		params.Value = Value;
+		ProcessEvent(this, fn, &params);
+	}
+};
+
 struct ALightingController {
-	char pad[0x7a8];
+	char UnknownData_3C8[0x8]; // 0x3c8(0x08)
+	char pad[0x23C];
+	//struct FLightingControllerPostProcessParams PostProcessParams; // 0x3d0(0x1a0)
+	//struct FLightingControllerRainParams RainParams; // 0x570(0x18)
+	//struct FLightingControllerLightningParams LightningParams; // 0x588(0x40)
+	//struct FLightingControllerLightingParams LightingParams; // 0x5c8(0x44)
+	char UnknownData_60C[0x4]; // 0x60c(0x04)
+	char pad2[0x38];
+	//struct FLightingControllerMoonParams MoonParams; // 0x610(0x38)
+	char UnknownData_648[0x8]; // 0x648(0x08)
+	char pad3[0xc8];
+	//struct FLightingControllerTransformParams TransformParams; // 0x650(0x90)
+	//struct FLightingControllerTimeParams TimeParams; // 0x6e0(0x20)
+	//struct FLightingControllerIslandDangerParams DangerLevelParams; // 0x700(0x08)
+	struct TArray<struct ULightingControllerSettings*> LightingSettings; // 0x708(0x10)
+	struct AStaticMeshActor* OverworldFarQuad; // 0x718(0x08)
+	struct AStaticMeshActor* UnderworldFarQuad; // 0x720(0x08)
+	float FixedTimeOfDay; // 0x728(0x04)
+	int32_t FixedDay; // 0x72c(0x04)
+	bool IsFixedTimeOfDay; // 0x730(0x01)
+	char UnknownData_731[0x7]; // 0x731(0x07)
+	struct USceneComponent* RootSceneComponent; // 0x738(0x08)
+	char pad4[0x50];
+	//struct FLightingControllerAssetParams AssetParams; // 0x740(0x50)
+	struct UDirectionalLightComponent* DirectionalLight; // 0x790(0x08)
+	struct UStaticMeshComponent* SkyDome; // 0x798(0x08)
+	struct UStaticMeshComponent* NorthStar; // 0x7a0(0x08)
 	struct UExponentialHeightFogComponent* Fog; // 0x7a8(0x08)
 	struct UExponentialHeightFogComponent* UnderwaterFog; // 0x7b0(0x08)
 	struct UPostProcessComponent* GlobalPostProcess; // 0x7b8(0x08)
@@ -2993,7 +3071,7 @@ struct ALightingController {
 	char ShowDebugUnderwater : 1; // 0x7e8(0x01)
 	char UnknownData_7E8_4 : 4; // 0x7e8(0x01)
 	char UnknownData_7E9[0x27]; // 0x7e9(0x27)
-	char pad2[0x480];
+	char pad5[0x480];
 	//struct FLightingControllerLightingVars LightingVars; // 0x810(0x460)
 	//struct FLightingControllerMaterialInstances MaterialInstances; // 0xc70(0x20)
 	struct TArray<struct AActor*> ReflectionProbes; // 0xc90(0x10)
@@ -3002,6 +3080,12 @@ struct ALightingController {
 	char UnknownData_CD0[0xa8]; // 0xcd0(0xa8)
 	struct UCurveFloat* EndOfWorldLightingZoneWeightCurve; // 0xd78(0x08)
 	char UnknownData_D80[0xf0]; // 0xd80(0xf0)
+
+	void SetCurrentWorldLocation(struct FName InCurrentWorldLocation); // Function Athena.LightingController.SetCurrentWorldLocation // Final|Native|Public|HasOutParms|BlueprintCallable // @ game+0xf64440
+	bool IsPlayingInEditor(); // Function Athena.LightingController.IsPlayingInEditor // Final|Native|Public|BlueprintCallable|BlueprintPure|Const // @ game+0xf60610
+	bool IsPlayerInBoatSpace(); // Function Athena.LightingController.IsPlayerInBoatSpace // Final|Native|Public|BlueprintCallable|BlueprintPure|Const // @ game+0xf605e0
+	struct TArray<struct FLightingZoneBlendValues> GetZoneWeights(); // Function Athena.LightingController.GetZoneWeights // Final|Native|Public|BlueprintCallable // @ game+0xf60250
+	float GetRainWeight(); // Function Athena.LightingController.GetRainWeight // Final|Native|Public|BlueprintCallable // @ game+0xf5fda0
 };
 
 struct FStringAssetReference {

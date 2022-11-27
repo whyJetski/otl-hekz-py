@@ -9,6 +9,7 @@ static int getMapNameCode(char* name);
 static std::string getIslandNameByCode(int code);
 static std::string getShortName(std::string name);
 static UAthenaGameViewportClient* AthenaGameViewportClient = nullptr;
+static ALightingController* LightingController;
 
 class Cheat {
 private:
