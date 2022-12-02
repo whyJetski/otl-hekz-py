@@ -307,6 +307,7 @@ private:
                 float itemdistance = 0.f;
                 bool b_ship_pins = true;
                 bool barrelstoggle = true;
+                bool hptext = false;
             } others;
             struct
             {

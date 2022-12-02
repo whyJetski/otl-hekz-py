@@ -610,7 +610,7 @@ void Cheat::Renderer::Drawing::RenderText(const char* text, const FVector2D& pos
 
     // That "outline" doubles text drawn count so heaviest part of code becomes twice as slow while it's absolutely unnecessary
 
-    if (cfg.visuals.bEnable && cfg.visuals.textoutlines)
+    if (cfg.visuals.bEnable /*&& cfg.visuals.textoutlines*/)
     {
         window->DrawList->AddText(nullptr, 0.f, ImVec2(ImScreen.x - 1.f, ImScreen.y + 1.f), ImGui::GetColorU32(IM_COL32_BLACK), text);
     }
@@ -1996,7 +1996,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                     auto ship = localCharacter->GetCurrentShip();
                                     if (ship)
                                     {
-                                        if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52)) continue;
+                                        if ((actor->GetAttachParentActor() == localCharacter->GetCurrentShip() || actor->GetParentActor() == localCharacter->GetCurrentShip()) && !GetAsyncKeyState(0x52) && ship != NULL) continue;
                                     }
                                     if (localController->ProjectWorldLocationToScreen(location, screen))
                                     {
@@ -2021,7 +2021,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                     auto ship = localCharacter->GetCurrentShip();
                                     if (ship)
                                     {
-                                        if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52)) continue;
+                                        if ((actor->GetAttachParentActor() == localCharacter->GetCurrentShip() || actor->GetParentActor() == localCharacter->GetCurrentShip()) && !GetAsyncKeyState(0x52) && ship != NULL) continue;
                                     }
                                     if (localController->ProjectWorldLocationToScreen(location, screen))
                                     {
@@ -2541,6 +2541,21 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 }
                                 }
 
+                            }
+                            if (cfg.misc.others.hptext)
+                            {
+                                auto const healthComp = actor->HealthComponent;
+                                if (!healthComp)
+                                    continue;
+
+                                const float hp = (healthComp->GetCurrentHealth() / healthComp->GetMaxHealth()) * 100;
+                                const float width2 = width * 0.5f;
+                                const float adjust = height * 0.025f;
+                                char buf[0x30];
+                                //snprintf(buf + len, sizeof(buf) - len, " [%dm]", dist);
+                                sprintf(buf, "%.fHP", hp);
+                                FVector2D pos = { footPos.X, footPos.Y + adjust * 3.f };
+                                Drawing::RenderText(buf, pos, cfg.visuals.players.textCol);
                             }
                         }
 
@@ -4362,6 +4377,7 @@ void Cheat::Renderer::renderSubTab1() {
         ImGui::Checkbox("Draw Name", &cfg.visuals.players.bName);
         //ImGui::Checkbox("Draw Weapon Name WIP ", &cfg.visuals.players.bWeaponanmes);
         ImGui::Checkbox("Draw Skeleton WIP ", &cfg.visuals.players.bSkeleton);
+        ImGui::Checkbox("HP Text", &cfg.misc.others.hptext);
         ImGui::Combo("Box Type", reinterpret_cast<int*>(&cfg.visuals.players.boxType), boxes, IM_ARRAYSIZE(boxes));
         ImGui::Combo("Health Bar Type", reinterpret_cast<int*>(&cfg.visuals.players.barType), bars, IM_ARRAYSIZE(bars));
         ImGui::ColorEdit4("Visible Enemy", &cfg.visuals.players.enemyColorVis.x, 0); ImGui::SameLine();
@@ -4568,6 +4584,7 @@ void Cheat::Renderer::renderSubTab1() {
 
         ImGui::Checkbox("Oxygen Level", &cfg.visuals.client.bOxygen);
         ImGui::Checkbox("Compass", &cfg.visuals.client.bCompass);
+        ImGui::Checkbox("FREECAM TEST", &cfg.misc.others.freecam);
 
         ImGui::Checkbox("Debug", &cfg.visuals.client.bDebug);
         if (cfg.visuals.client.bDebug)
