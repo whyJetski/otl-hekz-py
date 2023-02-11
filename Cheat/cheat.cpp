@@ -4902,7 +4902,7 @@ inline BYTE* Cheat::Tools::PacthFn(HMODULE mod, BYTE* sig, SIZE_T sigSize, BYTE*
 }
 
 inline bool Cheat::Tools::FindNameArray()
-{
+{   
     static BYTE sig[] = { 0x48, 0x8b, 0x1d, 0x00, 0x00, 0x00, 0x00, 0x48, 0x85, 0xdb, 0x75, 0x00, 0xb9, 0x08, 0x04, 0x00, 0x00 };
     auto address = reinterpret_cast<decltype(FName::GNames)*>(FindPointer(sig, sizeof(sig)));
     if (!address) return 0;
@@ -4917,7 +4917,7 @@ inline bool Cheat::Tools::FindObjectsArray()
     UObject::GObjects = reinterpret_cast<decltype(UObject::GObjects)>(FindPointer(sig, sizeof(sig), 16));
     return UObject::GObjects;
 }
-
+    
 inline bool Cheat::Tools::FindWorld()
 {
     static BYTE sig[] = { 0x48, 0x8B, 0x05, 0x00, 0x00, 0x00, 0x00, 0x48, 0x8B, 0x88, 0x00, 0x00, 0x00, 0x00, 0x48, 0x85, 0xC9, 0x74, 0x06, 0x48, 0x8B, 0x49, 0x70 };
