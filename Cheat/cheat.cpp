@@ -532,15 +532,12 @@ void Cheat::Hacks::ProcessEventHook(void* obj, UFunction* function, void* parms)
         if (result->ContentsType->GetFullName().find("ScriptStruct Athena.TakeItemFromContainerRPC") != std::string::npos)
         {
             Logger::Log("asd\n");
-            //Logger::Log("%c", result->ContentsType);
            // return;
         }
-        if (result->ContentsType->GetFullName().find("ScriptStruct Athena.BoxedRpcShipStockOffersPurchased") != std::string::npos)
+        if (result->ContentsType->GetFullName().find("ScriptStruct Athena.ProjectileWeaponFireInaccuracySeedMismatchTelemetryEvent") != std::string::npos)
         {
-            Logger::Log("asd2\n");
-            //Logger::Log("%d\n");
-           // return;
-
+            Logger::Log("asd\n");
+            //return;
         }
     }
 
@@ -577,15 +574,14 @@ void Cheat::Hacks::Init()
     //Logger::Log("AddPitchInput: 0x%llX\n", fn->Func);
 
 
-   /* UClass* klass = UObject::FindObject<UClass>("Class Athena.ProjectileWeapon");
+    /*UClass* klass = UObject::FindObject<UClass>("Class Athena.ProjectileWeapon");
     Logger::Log("Class Athena.ProjectileWeapon: 0x%llX\n", klass);
     void* vtable_raw = klass->Vtable;
     Logger::Log("Vtable: 0x%llX\n", vtable_raw);
     UINT64* vtable_uint64 = (UINT64*)vtable_raw;
     Logger::Log("ProcessEvent: 0x%llX\n", vtable_uint64[55]);
-    //SetHook((void*)0x7FF6ACA1F6D0, ProcessEventHook, reinterpret_cast<void**>(&ProcessEventOriginal));
-    SetHook((void*)vtable_uint64[55], ProcessEventHook, reinterpret_cast<void**>(&ProcessEventOriginal));*/
-    
+    SetHook((void*)0x7FF728508410, ProcessEventHook, reinterpret_cast<void**>(&ProcessEventOriginal));
+    */
 
 }
 
@@ -593,7 +589,7 @@ inline void Cheat::Hacks::Remove()
 {
     //RemoveHook(CanFireOriginal);
    //RemoveHook(OnWeaponFiredOriginal);
-   //RemoveHook(ProcessEventOriginal);
+   // RemoveHook(ProcessEventOriginal);
 }
 
 void Cheat::Renderer::Drawing::RenderText(const char* text, const FVector2D& pos, const ImVec4& color, const bool outlined = false, const bool centered = true)
@@ -610,7 +606,7 @@ void Cheat::Renderer::Drawing::RenderText(const char* text, const FVector2D& pos
 
     // That "outline" doubles text drawn count so heaviest part of code becomes twice as slow while it's absolutely unnecessary
 
-    if (cfg.visuals.bEnable /*&& cfg.visuals.textoutlines*/)
+    if (cfg.visuals.bEnable && cfg.visuals.textoutlines)
     {
         window->DrawList->AddText(nullptr, 0.f, ImVec2(ImScreen.x - 1.f, ImScreen.y + 1.f), ImGui::GetColorU32(IM_COL32_BLACK), text);
     }
@@ -783,7 +779,7 @@ bool raytrace(UWorld* world, const struct FVector& start, const struct FVector& 
 
     return UKismetMathLibrary::LineTraceSingle_NEW((UObject*)world, start, end, ETraceTypeQuery::TraceTypeQuery4, true, TArray<AActor*>() /*actors to ignore*/, EDrawDebugTrace::EDrawDebugTrace__None, true, hit); //TraceTypeQuery4 equals the visibility channel
 }
-
+    
 /*bool GetProjectilePath(std::vector<FVector>& v, FVector& Vel, FVector& Pos, float Gravity, int count, UWorld* world)
 {
     float interval = 0.033f;
@@ -1555,7 +1551,6 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                         localController->IdleDisconnectEnabled = false;
 
                     }
-
                 }
 
                 if (cfg.misc.game.bEnable)
@@ -1662,6 +1657,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                     if (!actor) continue;
 
 
+                    
 
                     {
                         //if (actor->isShip())
@@ -1993,11 +1989,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 {
                                     const int dist = localLoc.DistTo(location) * 0.01f;
                                     if (dist > cfg.visuals.items.itemdrawdistance) continue;
-                                    auto ship = localCharacter->GetCurrentShip();
-                                    if (ship)
-                                    {
-                                        if ((actor->GetAttachParentActor() == localCharacter->GetCurrentShip() || actor->GetParentActor() == localCharacter->GetCurrentShip()) && !GetAsyncKeyState(0x52) && ship != NULL) continue;
-                                    }
+                                    if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52) && localCharacter->GetCurrentShip() != NULL) continue;
                                     if (localController->ProjectWorldLocationToScreen(location, screen))
                                     {
                                         auto const desc = actor->GetItemInfo()->Desc;
@@ -2018,11 +2010,7 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 {
                                     const int dist = localLoc.DistTo(location) * 0.01f;
                                     if (dist > cfg.visuals.items.barreldrawdistance) continue;
-                                    auto ship = localCharacter->GetCurrentShip();
-                                    if (ship)
-                                    {
-                                        if ((actor->GetAttachParentActor() == localCharacter->GetCurrentShip() || actor->GetParentActor() == localCharacter->GetCurrentShip()) && !GetAsyncKeyState(0x52) && ship != NULL) continue;
-                                    }
+                                    if (actor->GetAttachParentActor() == localCharacter->GetCurrentShip() && !GetAsyncKeyState(0x52) && localCharacter->GetCurrentShip() != NULL) continue;
                                     if (localController->ProjectWorldLocationToScreen(location, screen))
                                     {
                                         char buf[0x64];
@@ -2541,21 +2529,6 @@ HRESULT Cheat::Renderer::PresentHook(IDXGISwapChain* swapChain, UINT syncInterva
                                 }
                                 }
 
-                            }
-                            if (cfg.misc.others.hptext)
-                            {
-                                auto const healthComp = actor->HealthComponent;
-                                if (!healthComp)
-                                    continue;
-
-                                const float hp = (healthComp->GetCurrentHealth() / healthComp->GetMaxHealth()) * 100;
-                                const float width2 = width * 0.5f;
-                                const float adjust = height * 0.025f;
-                                char buf[0x30];
-                                //snprintf(buf + len, sizeof(buf) - len, " [%dm]", dist);
-                                sprintf(buf, "%.fHP", hp);
-                                FVector2D pos = { footPos.X, footPos.Y + adjust * 3.f };
-                                Drawing::RenderText(buf, pos, cfg.visuals.players.textCol);
                             }
                         }
 
@@ -4377,7 +4350,6 @@ void Cheat::Renderer::renderSubTab1() {
         ImGui::Checkbox("Draw Name", &cfg.visuals.players.bName);
         //ImGui::Checkbox("Draw Weapon Name WIP ", &cfg.visuals.players.bWeaponanmes);
         ImGui::Checkbox("Draw Skeleton WIP ", &cfg.visuals.players.bSkeleton);
-        ImGui::Checkbox("HP Text", &cfg.misc.others.hptext);
         ImGui::Combo("Box Type", reinterpret_cast<int*>(&cfg.visuals.players.boxType), boxes, IM_ARRAYSIZE(boxes));
         ImGui::Combo("Health Bar Type", reinterpret_cast<int*>(&cfg.visuals.players.barType), bars, IM_ARRAYSIZE(bars));
         ImGui::ColorEdit4("Visible Enemy", &cfg.visuals.players.enemyColorVis.x, 0); ImGui::SameLine();
@@ -4584,7 +4556,6 @@ void Cheat::Renderer::renderSubTab1() {
 
         ImGui::Checkbox("Oxygen Level", &cfg.visuals.client.bOxygen);
         ImGui::Checkbox("Compass", &cfg.visuals.client.bCompass);
-        ImGui::Checkbox("FREECAM TEST", &cfg.misc.others.freecam);
 
         ImGui::Checkbox("Debug", &cfg.visuals.client.bDebug);
         if (cfg.visuals.client.bDebug)
@@ -4902,8 +4873,8 @@ inline BYTE* Cheat::Tools::PacthFn(HMODULE mod, BYTE* sig, SIZE_T sigSize, BYTE*
 }
 
 inline bool Cheat::Tools::FindNameArray()
-{   
-    static BYTE sig[] = { 0x48, 0x8b, 0x1d, 0x00, 0x00, 0x00, 0x00, 0x48, 0x85, 0xdb, 0x75, 0x00, 0xb9, 0x08, 0x04, 0x00, 0x00 };
+{
+    static BYTE sig[] = { 0x48, 0x89, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x41, 0x8B, 0x75, 0x00 };
     auto address = reinterpret_cast<decltype(FName::GNames)*>(FindPointer(sig, sizeof(sig)));
     if (!address) return 0;
     Logger::Log("%p\n", address);
@@ -4913,11 +4884,11 @@ inline bool Cheat::Tools::FindNameArray()
 
 inline bool Cheat::Tools::FindObjectsArray()
 {
-    static BYTE sig[] = { 0x89, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x48, 0x8B, 0xDF, 0x48, 0x89, 0x5C, 0x24 };
-    UObject::GObjects = reinterpret_cast<decltype(UObject::GObjects)>(FindPointer(sig, sizeof(sig), 16));
+    static BYTE sig[] = { 0x48, 0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x81, 0x4C, 0xD1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x8D, 0x4D, 0xD8 };
+    UObject::GObjects = reinterpret_cast<decltype(UObject::GObjects)>(FindPointer(sig, sizeof(sig)));
     return UObject::GObjects;
 }
-    
+
 inline bool Cheat::Tools::FindWorld()
 {
     static BYTE sig[] = { 0x48, 0x8B, 0x05, 0x00, 0x00, 0x00, 0x00, 0x48, 0x8B, 0x88, 0x00, 0x00, 0x00, 0x00, 0x48, 0x85, 0xC9, 0x74, 0x06, 0x48, 0x8B, 0x49, 0x70 };
@@ -4928,7 +4899,6 @@ inline bool Cheat::Tools::FindWorld()
 inline bool Cheat::Tools::InitSDK()
 {
     AthenaGameViewportClient = UObject::FindObject<UAthenaGameViewportClient>("AthenaGameViewportClient Transient.AthenaGameEngine_1.AthenaGameViewportClient_1");
-    //LightingController = UObject::FindObject<ALightingController>("Class Athena.LightingController");
     if (!UCrewFunctions::Init()) return false;
     if (!UKismetMathLibrary::Init()) return false;
     return true;
@@ -5050,6 +5020,7 @@ void Cheat::Tests()
     Logger::Log("%p\n", localController);
     */
 }
+
 
 bool Cheat::Remove()
 {
