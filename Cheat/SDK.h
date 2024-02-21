@@ -3170,6 +3170,7 @@ struct ALightingController {
 	float GetRainWeight(); // Function Athena.LightingController.GetRainWeight // Final|Native|Public|BlueprintCallable // @ game+0xf5fda0
 };
 
+
 struct FStringAssetReference {
 	struct FString AssetLongPathname; // 0x00(0x10)
 };
